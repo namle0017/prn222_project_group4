@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Entities\" />
     <Folder Include="Models\Data\" />
+    <Folder Include="Models\Entities\" />
   </ItemGroup>
 
 </Project>

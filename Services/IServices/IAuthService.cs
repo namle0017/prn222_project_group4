@@ -4,6 +4,6 @@ namespace FapWeb.Services.IServices
 {
     public interface IAuthService
     {
-        string LoginAsync(LoginRequestDto request);
+        LoginResponseDto LoginAsync(LoginRequestDto request);
     }
 }
