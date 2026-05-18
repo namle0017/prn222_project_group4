@@ -3,12 +3,13 @@ using FapWeb.Services.IServices;
 using BCrypt.Net;
 using FapWeb.Models.Data;
 using Microsoft.EntityFrameworkCore;
+using FapWeb.Models.Dtos.ChangePasswordDtos;
 
 namespace FapWeb.Services.Service
 {
     public class AuthService : IAuthService
     {
-        public PostgresContext _context;
+        private readonly PostgresContext _context;
         public AuthService(PostgresContext context)
         {
             _context = context;
@@ -43,6 +44,25 @@ namespace FapWeb.Services.Service
                 UserName = user.FullName,
                 UserRole = user.RoleName
             };
+        }
+
+        public async Task<bool> ChangePassword(ChangePasswordRequestDto request)
+        {
+            var user = await _context.Users.FindAsync(request.UserId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            bool isValidPassword = VerifyPassword(request.OldPassword, user.PasswordHash);
+            if (!isValidPassword)
+            {
+                return false;
+            }
+
+            user.PasswordHash = HashPassword(request.NewPassword);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         private bool VerifyPassword(string password, string hashedPassword)

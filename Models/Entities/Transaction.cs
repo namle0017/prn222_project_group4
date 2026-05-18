@@ -19,7 +19,9 @@ public partial class Transaction
 
     public Guid? PaidBy { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     public virtual User? PaidByNavigation { get; set; }
 

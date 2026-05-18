@@ -17,7 +17,9 @@ public partial class AttendanceCheck
 
     public string? Note { get; set; }
 
-    public DateTime? CheckedAt { get; set; }
+    public DateTime CheckedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     public virtual User? CheckedByNavigation { get; set; }
 

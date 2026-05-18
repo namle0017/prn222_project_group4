@@ -23,6 +23,8 @@ public partial class Class
 
     public DateTime? CreatedAt { get; set; }
 
+    public DateTime? UpdatedAt { get; set; }
+
     public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
 
     public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();

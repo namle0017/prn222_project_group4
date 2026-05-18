@@ -21,6 +21,8 @@ public partial class TuitionFee
 
     public DateTime? CreatedAt { get; set; }
 
+    public DateTime? UpdatedAt { get; set; }
+
     public virtual Class? Class { get; set; }
 
     public virtual TuitionFeeStatus? Status { get; set; }

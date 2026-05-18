@@ -79,14 +79,14 @@ public partial class PostgresContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
             entity.Property(e => e.CheckedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("checked_at");
             entity.Property(e => e.CheckedBy).HasColumnName("checked_by");
             entity.Property(e => e.Note).HasColumnName("note");
             entity.Property(e => e.ScheduleId).HasColumnName("schedule_id");
             entity.Property(e => e.StatusId).HasColumnName("status_id");
             entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity.HasOne(d => d.CheckedByNavigation).WithMany(p => p.AttendanceCheckCheckedByNavigations)
                 .HasForeignKey(d => d.CheckedBy)
@@ -135,8 +135,7 @@ public partial class PostgresContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("class_name");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.MaxStudents)
@@ -148,6 +147,7 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
             entity.Property(e => e.TotalSessions).HasColumnName("total_sessions");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity.HasOne(d => d.Teacher).WithMany(p => p.Classes)
                 .HasForeignKey(d => d.TeacherId)
@@ -170,6 +170,7 @@ public partial class PostgresContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("enrolled_at");
+            entity.Property(e => e.IsEnable).HasColumnName("is_enable");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasDefaultValueSql("'ACTIVE'::character varying")
@@ -259,8 +260,7 @@ public partial class PostgresContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.ClassId).HasColumnName("class_id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
             entity.Property(e => e.ScheduleDate).HasColumnName("schedule_date");
@@ -268,6 +268,7 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.Topic)
                 .HasMaxLength(255)
                 .HasColumnName("topic");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity.HasOne(d => d.Class).WithMany(p => p.Schedules)
                 .HasForeignKey(d => d.ClassId)
@@ -287,8 +288,7 @@ public partial class PostgresContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
             entity.Property(e => e.GuardianId).HasColumnName("guardian_id");
             entity.Property(e => e.IsPrimary)
@@ -296,6 +296,7 @@ public partial class PostgresContext : DbContext
                 .HasColumnName("is_primary");
             entity.Property(e => e.RelationshipId).HasColumnName("relationship_id");
             entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity.HasOne(d => d.Guardian).WithMany(p => p.StudentGuardianGuardians)
                 .HasForeignKey(d => d.GuardianId)
@@ -325,8 +326,7 @@ public partial class PostgresContext : DbContext
                 .HasPrecision(12, 2)
                 .HasColumnName("amount");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
             entity.Property(e => e.PaidBy).HasColumnName("paid_by");
             entity.Property(e => e.PaymentMethod)
@@ -337,6 +337,7 @@ public partial class PostgresContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("transaction_code");
             entity.Property(e => e.TuitionFeeId).HasColumnName("tuition_fee_id");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity.HasOne(d => d.PaidByNavigation).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.PaidBy)
@@ -377,8 +378,7 @@ public partial class PostgresContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.ClassId).HasColumnName("class_id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
             entity.Property(e => e.DueDate).HasColumnName("due_date");
             entity.Property(e => e.PaidAmount)
@@ -390,6 +390,7 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.TotalAmount)
                 .HasPrecision(12, 2)
                 .HasColumnName("total_amount");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity.HasOne(d => d.Class).WithMany(p => p.TuitionFees)
                 .HasForeignKey(d => d.ClassId)

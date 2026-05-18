@@ -15,6 +15,8 @@ public partial class ClassStudent
 
     public string? Status { get; set; }
 
+    public bool? IsEnable { get; set; }
+
     public virtual Class Class { get; set; } = null!;
 
     public virtual User Student { get; set; } = null!;

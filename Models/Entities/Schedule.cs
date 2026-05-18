@@ -19,6 +19,8 @@ public partial class Schedule
 
     public DateTime? CreatedAt { get; set; }
 
+    public DateTime? UpdatedAt { get; set; }
+
     public virtual ICollection<AttendanceCheck> AttendanceChecks { get; set; } = new List<AttendanceCheck>();
 
     public virtual Class Class { get; set; } = null!;

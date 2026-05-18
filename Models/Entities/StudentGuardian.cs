@@ -17,6 +17,8 @@ public partial class StudentGuardian
 
     public DateTime? CreatedAt { get; set; }
 
+    public DateTime? UpdatedAt { get; set; }
+
     public virtual User Guardian { get; set; } = null!;
 
     public virtual FamilyRelationship? Relationship { get; set; }
