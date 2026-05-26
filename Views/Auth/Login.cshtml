@@ -1,0 +1,39 @@
+@model FapWeb.Models.Dtos.LoginDtos.LoginRequestDto
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Đăng nhập</h2>
+
+                <form asp-action="Login" asp-controller="Auth" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="UserPhoneNumber" class="form-label"></label>
+                        <input asp-for="UserPhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                        <span asp-validation-for="UserPhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UserPassword" class="form-label"></label>
+                        <input asp-for="UserPassword" class="form-control" placeholder="Nhập mật khẩu" />
+                        <span asp-validation-for="UserPassword" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

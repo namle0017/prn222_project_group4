@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="~/FapWeb.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var sessionUserId = Context.Session.GetString("UserId");
+        var sessionRoleName = Context.Session.GetString("RoleName");
+        var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
+    }
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -25,7 +30,35 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if (isLoggedIn)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Transaction" asp-action="MyHistory">Giao dịch của tôi</a>
+                            </li>
+                            @if (sessionRoleName == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Transaction" asp-action="Index">Quản lý giao dịch</a>
+                                </li>
+                            }
+                        }
                     </ul>
+                    <div class="d-flex align-items-center gap-2">
+                        @if (isLoggedIn)
+                        {
+                            <span class="text-muted small">
+                                UserId: @sessionUserId | Role: @sessionRoleName
+                            </span>
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="mb-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-primary btn-sm" asp-controller="Auth" asp-action="Login">Login</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>

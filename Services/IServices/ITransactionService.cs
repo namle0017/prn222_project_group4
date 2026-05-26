@@ -1,9 +1,10 @@
-﻿using FapWeb.Models.Dtos.TransactionHistoryDtos;
+﻿using FapWeb.Models.Dtos.PaginatedDtos;
+using FapWeb.Models.Dtos.TransactionHistoryDtos;
 
 namespace FapWeb.Services.IServices
 {
     public interface ITransactionService
     {
-        List<TransactionHistoryResponseDto> GetTransactionHistory(TransactionHistoryRequestDto request);
+        Task<List<TransactionHistoryResponseDto>> GetTransactionAsync(TransactionHistoryRequestDto request);
     }
 }

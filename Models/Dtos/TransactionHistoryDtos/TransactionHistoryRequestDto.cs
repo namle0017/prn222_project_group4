@@ -1,9 +1,11 @@
-﻿namespace FapWeb.Models.Dtos.TransactionHistoryDtos
+﻿using FapWeb.Models.Dtos.PaginatedDtos;
+using FapWeb.Models.Dtos.TransactionHistoryDtos.Childs;
+
+namespace FapWeb.Models.Dtos.TransactionHistoryDtos
 {
     public class TransactionHistoryRequestDto
     {
-        public Guid UserId { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
+        public UserQueryRequestDto QueryUser { get; set; }
+        public PaginatedDto Paginated { get; set; }
     }
 }

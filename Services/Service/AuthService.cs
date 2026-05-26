@@ -14,7 +14,7 @@ namespace FapWeb.Services.Service
         {
             _context = context;
         }
-        public LoginResponseDto LoginAsync(LoginRequestDto request)
+        public LoginResponseDto? LoginAsync(LoginRequestDto request)
         {
             var user = _context.Users
                                                 .Include(u => u.Role)
