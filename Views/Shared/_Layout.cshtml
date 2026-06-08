@@ -10,9 +10,12 @@
 </head>
 <body>
     @{
-        var sessionUserId = Context.Session.GetString("UserId");
-        var sessionRoleName = Context.Session.GetString("RoleName");
+        var sessionUserId = Context.Session.GetString(AppSessionKeys.UserId);
+        var sessionRoleName = Context.Session.GetString(AppSessionKeys.RoleName);
         var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
+        var isStaff = AppRoles.IsStaff(sessionRoleName);
+        var isAdmin = AppRoles.IsAdmin(sessionRoleName);
+        var canViewStudentAreas = AppRoles.IsParent(sessionRoleName) || AppRoles.IsStudent(sessionRoleName);
     }
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -25,20 +28,57 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         @if (isLoggedIn)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Transaction" asp-action="MyHistory">Giao dịch của tôi</a>
-                            </li>
-                            @if (sessionRoleName == "Admin")
+                            @if (isStaff)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Transaction" asp-action="Index">Quản lý giao dịch</a>
+                                    <a class="nav-link text-dark" asp-controller="ClassManagement" asp-action="Index">Classes</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="ScheduleManagement" asp-action="Index">Schedule</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Attendance" asp-action="Index">Attendance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Tuition" asp-action="Index">Tuition</a>
+                                </li>
+                            }
+
+                            @if (isAdmin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Transaction" asp-action="Index">Transactions</a>
+                                </li>
+                            }
+
+                            @if (canViewStudentAreas || isStaff)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Notification" asp-action="Index">Notifications</a>
+                                </li>
+                            }
+
+                            @if (canViewStudentAreas)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Attendance" asp-action="History">Attendance History</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Tuition" asp-action="History">Payment History</a>
+                                </li>
+                            }
+
+                            @if (!AppRoles.IsStaff(sessionRoleName))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Transaction" asp-action="MyHistory">My Transactions</a>
                                 </li>
                             }
                         }
@@ -47,7 +87,7 @@
                         @if (isLoggedIn)
                         {
                             <span class="text-muted small">
-                                UserId: @sessionUserId | Role: @sessionRoleName
+                                Signed in as @sessionRoleName
                             </span>
                             <form asp-controller="Auth" asp-action="Logout" method="post" class="mb-0">
                                 @Html.AntiForgeryToken()
