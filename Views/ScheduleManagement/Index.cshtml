@@ -1,0 +1,87 @@
+@model FapWeb.Models.Dtos.ScheduleManagementDtos.ScheduleManagementIndexDto
+
+@{
+    ViewData["Title"] = "Schedule Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn btn-primary">Create Schedule</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Total Schedules</div><div class="fs-3 fw-semibold">@Model.TotalSchedules</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Today</div><div class="fs-3 fw-semibold">@Model.TodaySchedules</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Upcoming</div><div class="fs-3 fw-semibold">@Model.UpcomingSchedules</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Classes Covered</div><div class="fs-3 fw-semibold">@Model.ClassesCovered</div></div></div></div>
+    </div>
+
+    <form asp-action="Index" method="get" class="row g-2 mb-4">
+        <div class="col-md-5">
+            <select name="classId" class="form-select">
+                <option value="">All Classes</option>
+                @foreach (var item in Model.ClassOptions)
+                {
+                    <option value="@item.Value" selected="@(Model.ClassIdFilter?.ToString() == item.Value)">@item.Label</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-5">
+            <input type="date" name="dateFilter" value="@(Model.DateFilter?.ToString("yyyy-MM-dd"))" class="form-control" />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-primary">Filter</button>
+        </div>
+    </form>
+
+    @if (!Model.Schedules.Any())
+    {
+        <div class="alert alert-info shadow-sm">No schedules found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Class</th>
+                        <th>Teacher</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Topic</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Schedules)
+                    {
+                        <tr>
+                            <td>@item.ClassName</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TeacherName) ? "Unassigned" : item.TeacherName)</td>
+                            <td>@item.ScheduleDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.StartTime - @item.EndTime</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Topic) ? "N/A" : item.Topic)</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a asp-action="Edit" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a asp-action="ClassSchedule" asp-route-classId="@item.ClassId" class="btn btn-sm btn-outline-primary">Class View</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,51 @@
+@model FapWeb.Models.Dtos.ScheduleManagementDtos.ClassScheduleViewDto
+
+@{
+    ViewData["Title"] = "Class Schedule";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">@Model.ClassName</h2>
+            <div class="text-muted">Teacher: @(string.IsNullOrWhiteSpace(Model.TeacherName) ? "Unassigned" : Model.TeacherName)</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Create" asp-route-classId="@Model.ClassId" class="btn btn-primary">Add Schedule</a>
+            <a asp-controller="ClassManagement" asp-action="Details" asp-route-id="@Model.ClassId" class="btn btn-outline-secondary">Back to Class</a>
+        </div>
+    </div>
+
+    @if (!Model.Schedules.Any())
+    {
+        <div class="alert alert-info shadow-sm">No schedules for this class.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Topic</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Schedules)
+                    {
+                        <tr>
+                            <td>@item.ScheduleDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.StartTime - @item.EndTime</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Topic) ? "N/A" : item.Topic)</td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.ScheduleId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
