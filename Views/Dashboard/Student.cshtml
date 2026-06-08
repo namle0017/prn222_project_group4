@@ -1,0 +1,62 @@
+@model FapWeb.Models.Dtos.DashboardDtos.StudentDashboardDto
+
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">My Classes</div><div class="fs-3 fw-semibold">@Model.MyClasses</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Absent Count</div><div class="fs-3 fw-semibold text-danger">@Model.AbsentCount</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Attendance Rate</div><div class="fs-3 fw-semibold">@Model.AttendanceRate%</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Tuition Remaining</div><div class="fs-5 fw-semibold text-danger">@Model.TuitionRemaining.ToString("N0") VND</div></div></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Schedules</h5>
+                    @if (!Model.UpcomingSchedules.Any())
+                    {
+                        <div class="alert alert-info mb-0">No schedules yet.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.UpcomingSchedules)
+                            {
+                                <li class="list-group-item px-0">@item.ClassName - @item.ScheduleDate.ToString("dd/MM/yyyy") @item.StartTime - @item.EndTime</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title">Latest Notifications</h5>
+                    @if (!Model.LatestNotifications.Any())
+                    {
+                        <div class="alert alert-info mb-0">No notifications yet.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.LatestNotifications)
+                            {
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span>@item.Title</span>
+                                    <span class="text-muted small">@(item.CreatedAt?.ToString("dd/MM HH:mm") ?? "N/A")</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

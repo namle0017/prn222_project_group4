@@ -1,0 +1,79 @@
+@model FapWeb.Models.Dtos.DashboardDtos.ParentDashboardDto
+
+@{
+    ViewData["Title"] = "Parent Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">My Children</div><div class="fs-3 fw-semibold">@Model.MyChildren</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Absent Count</div><div class="fs-3 fw-semibold text-danger">@Model.TotalAbsentCount</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Tuition Paid</div><div class="fs-5 fw-semibold text-success">@Model.TotalTuitionPaid.ToString("N0") VND</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Tuition Remaining</div><div class="fs-5 fw-semibold text-danger">@Model.TotalTuitionRemaining.ToString("N0") VND</div></div></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title">Children Overview</h5>
+                    @if (!Model.Children.Any())
+                    {
+                        <div class="alert alert-info mb-0">No children linked yet.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Child</th>
+                                        <th>Class</th>
+                                        <th>Attendance Rate</th>
+                                        <th>Remaining Tuition</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Children)
+                                    {
+                                        <tr>
+                                            <td>@item.ChildName</td>
+                                            <td>@item.ClassName</td>
+                                            <td>@item.AttendanceRate%</td>
+                                            <td>@item.RemainingTuition.ToString("N0") VND</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title">Latest Notifications</h5>
+                    @if (!Model.LatestNotifications.Any())
+                    {
+                        <div class="alert alert-info mb-0">No notifications yet.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.LatestNotifications)
+                            {
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span>@item.Title</span>
+                                    <span class="text-muted small">@(item.CreatedAt?.ToString("dd/MM HH:mm") ?? "N/A")</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
