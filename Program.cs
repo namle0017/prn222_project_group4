@@ -10,6 +10,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<PostgresContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<ITuitionService, TuitionService>();
+builder.Services.AddScoped<IClassManagementService, ClassManagementService>();
+builder.Services.AddScoped<IScheduleManagementService, ScheduleManagementService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
