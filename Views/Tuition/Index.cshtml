@@ -1,0 +1,94 @@
+@model IEnumerable<FapWeb.Models.Dtos.TuitionDtos.TuitionStudentStatusDto>
+
+@{
+    ViewData["Title"] = "Tuition Management";
+    var items = Model.ToList();
+    var paid = items.Count(x => x.StatusName == "PAID");
+    var partial = items.Count(x => x.StatusName == "PARTIAL");
+    var unpaid = items.Count(x => x.StatusName == "UNPAID");
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@ViewData["Title"]</h2>
+        <a asp-controller="Tuition" asp-action="History" class="btn btn-outline-secondary">Payment History</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Total Students</div><div class="fs-3 fw-semibold">@items.Count</div></div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Paid</div><div class="fs-3 fw-semibold text-success">@paid</div></div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Partial</div><div class="fs-3 fw-semibold text-warning">@partial</div></div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Unpaid</div><div class="fs-3 fw-semibold text-danger">@unpaid</div></div></div>
+        </div>
+    </div>
+
+    @if (!items.Any())
+    {
+        <div class="alert alert-info shadow-sm">No tuition records found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Required Fee</th>
+                        <th>Paid</th>
+                        <th>Remaining</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.StudentName</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.ClassName) ? "N/A" : item.ClassName)</td>
+                            <td>@item.RequiredFee.ToString("N0") VND</td>
+                            <td>@item.PaidAmount.ToString("N0") VND</td>
+                            <td>@item.RemainingAmount.ToString("N0") VND</td>
+                            <td>
+                                <span class="badge @(item.StatusName == "PAID" ? "bg-success" : item.StatusName == "PARTIAL" ? "bg-warning text-dark" : "bg-danger")">
+                                    @item.StatusName
+                                </span>
+                            </td>
+                            <td>@(item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a asp-action="CreatePayment" asp-route-tuitionFeeId="@item.TuitionFeeId" class="btn btn-sm btn-primary">Record Payment</a>
+                                    <a asp-action="History" asp-route-tuitionFeeId="@item.TuitionFeeId" class="btn btn-sm btn-outline-secondary">History</a>
+                                    <form asp-action="SendReminder" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" @(item.RemainingAmount <= 0 ? "disabled" : null)>Send Reminder</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
