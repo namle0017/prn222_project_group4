@@ -1,0 +1,38 @@
+@model FapWeb.Models.Dtos.NotificationDtos.NotificationResponseDto
+
+@{
+    ViewData["Title"] = "Notification Details";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="mb-1">@Model.Title</h2>
+                    <div class="text-muted small">
+                        Sender: @(string.IsNullOrWhiteSpace(Model.SenderName) ? "System" : Model.SenderName)
+                    </div>
+                </div>
+                <span class="badge @(Model.IsRead ? "bg-secondary" : "bg-warning text-dark")">
+                    @(Model.IsRead ? "Read" : "Unread")
+                </span>
+            </div>
+
+            <div class="mb-3 text-muted">
+                Created At:
+                @(Model.CreatedAt.HasValue ? Model.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "—")
+            </div>
+
+            <div class="border rounded p-3 bg-light mb-4" style="white-space: pre-wrap;">
+                @Model.Content
+            </div>
+
+            <a asp-controller="Notification"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                Back to Notifications
+            </a>
+        </div>
+    </div>
+</div>

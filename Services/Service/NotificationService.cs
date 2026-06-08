@@ -121,5 +121,54 @@ namespace FapWeb.Services.Service
             await _context.Notifications.AddRangeAsync(notifications);
             await _context.SaveChangesAsync();
         }
+
+        public async Task CreateTuitionReminderNotificationAsync(Guid teacherId, Guid studentId, decimal? amount, DateTime? dueDate)
+        {
+            var guardians = await _context.StudentGuardians
+                .AsNoTracking()
+                .Include(studentGuardian => studentGuardian.Student)
+                .Where(studentGuardian => studentGuardian.StudentId == studentId)
+                .ToListAsync();
+
+            if (guardians.Count == 0)
+            {
+                return;
+            }
+
+            var createdAt = DateTime.UtcNow;
+
+            var notifications = guardians.Select(studentGuardian =>
+            {
+                var studentName = studentGuardian.Student?.FullName;
+                var studentDisplayName = string.IsNullOrWhiteSpace(studentName) ? "the student" : studentName;
+
+                var content = $"Student {studentDisplayName} has unpaid tuition";
+
+                if (amount.HasValue)
+                {
+                    content += $" of {amount.Value:N0} VND";
+                }
+
+                if (dueDate.HasValue)
+                {
+                    content += $" due on {dueDate.Value:dd/MM/yyyy}";
+                }
+
+                content += ". Please check tuition history.";
+
+                return new Notification
+                {
+                    SenderId = teacherId,
+                    ReceiverId = studentGuardian.GuardianId,
+                    Title = "Tuition Reminder",
+                    Content = content,
+                    IsRead = false,
+                    CreatedAt = createdAt
+                };
+            }).ToList();
+
+            await _context.Notifications.AddRangeAsync(notifications);
+            await _context.SaveChangesAsync();
+        }
     }
 }
