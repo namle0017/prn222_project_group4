@@ -1,0 +1,44 @@
+@model IEnumerable<FapWeb.Models.Dtos.AttendanceDtos.AttendanceClassDto>
+
+@{
+    ViewData["Title"] = "Attendance Management";
+    var classes = Model.ToList();
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@ViewData["Title"]</h2>
+        <a asp-controller="Attendance" asp-action="History" class="btn btn-outline-secondary">View History</a>
+    </div>
+
+    @if (!classes.Any())
+    {
+        <div class="alert alert-info shadow-sm">
+            No classes are available for attendance yet.
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var item in classes)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.ClassName</h5>
+                            <p class="card-text text-muted mb-2">Room: @(string.IsNullOrWhiteSpace(item.RoomName) ? "N/A" : item.RoomName)</p>
+                            <p class="card-text text-muted mb-2">Teacher: @(string.IsNullOrWhiteSpace(item.TeacherName) ? "N/A" : item.TeacherName)</p>
+                            <span class="badge bg-primary-subtle text-primary-emphasis mb-3">@item.StudentCount students</span>
+
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a asp-action="Take" asp-route-classId="@item.ClassId" class="btn btn-primary btn-sm">Take Attendance</a>
+                                <a asp-controller="ScheduleManagement" asp-action="ClassSchedule" asp-route-classId="@item.ClassId" class="btn btn-outline-primary btn-sm">View Schedules</a>
+                                <a asp-action="History" class="btn btn-outline-secondary btn-sm">View History</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
