@@ -1,0 +1,89 @@
+@model IEnumerable<FapWeb.Models.Dtos.UserManagementDtos.UserListItemDto>
+
+@{
+    ViewData["Title"] = "Quản lý tài khoản";
+    var items = Model.ToList();
+    string? searchTerm = ViewBag.SearchTerm;
+    string? roleFilter = ViewBag.RoleFilter;
+    var roles = new[] { "ADMIN", "TEACHER", "PARENT", "STUDENT" };
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@ViewData["Title"]</h2>
+        <div class="d-flex gap-2">
+            <a asp-action="Guardians" class="btn btn-outline-secondary">Liên kết PH – HS</a>
+            <a asp-action="Create" class="btn btn-primary">+ Tạo tài khoản</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-5">
+            <input type="text" name="searchTerm" value="@searchTerm" class="form-control" placeholder="Tìm theo tên, SĐT hoặc email..." />
+        </div>
+        <div class="col-md-3">
+            <select name="roleFilter" class="form-select">
+                <option value="">-- Tất cả vai trò --</option>
+                @foreach (var role in roles)
+                {
+                    <option value="@role" selected="@(role == roleFilter)">@role</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary w-100">Lọc</button>
+        </div>
+    </form>
+
+    @if (!items.Any())
+    {
+        <div class="alert alert-info shadow-sm">Chưa có tài khoản nào.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>SĐT</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.Phone</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Email) ? "N/A" : item.Email)</td>
+                            <td><span class="badge bg-secondary">@item.RoleName</span></td>
+                            <td>
+                                <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
+                                    @(item.IsActive ? "Hoạt động" : "Vô hiệu")
+                                </span>
+                            </td>
+                            <td>@(item.CreatedAt.HasValue ? item.CreatedAt.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

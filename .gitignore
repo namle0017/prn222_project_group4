@@ -421,4 +421,10 @@ appsettings.json
 appsettings.*.json
 efpt.config.json
 
+# Cho phép commit file mẫu (không chứa secret)
+!appsettings.example.json
+
+# Env file chứa secrets cho docker-compose
+.env
+
 *.md

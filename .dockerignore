@@ -1,0 +1,26 @@
+# Build outputs
+bin/
+obj/
+
+# IDE / tooling
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Secrets - không đưa vào image, sẽ bơm qua biến môi trường lúc chạy
+.env
+
+# Misc
+README.md

@@ -1,3 +1,4 @@
+using FapWeb.Models.Dtos.ChangePasswordDtos;
 using FapWeb.Models.Dtos.LoginDtos;
 using FapWeb.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -61,6 +62,44 @@ namespace FapWeb.Controllers
             Response.Cookies.Append(RoleNameCookieKey, loginResult.UserRole, cookieOptions);
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString(UserIdSessionKey)))
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            return View(new ChangePasswordRequestDto());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto request)
+        {
+            var userIdStr = HttpContext.Session.GetString(UserIdSessionKey);
+            if (string.IsNullOrWhiteSpace(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(request);
+            }
+
+            request.UserId = userId;
+            var changed = await _authService.ChangePassword(request);
+            if (!changed)
+            {
+                ModelState.AddModelError(string.Empty, "Mật khẩu hiện tại không đúng.");
+                return View(request);
+            }
+
+            TempData["SuccessMessage"] = "Đổi mật khẩu thành công.";
+            return RedirectToAction("Index", "Dashboard");
         }
 
         [HttpPost]

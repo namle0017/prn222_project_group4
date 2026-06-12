@@ -1,0 +1,120 @@
+@model IEnumerable<FapWeb.Models.Dtos.UserManagementDtos.GuardianLinkListItemDto>
+
+@{
+    ViewData["Title"] = "Liên kết Phụ huynh – Học sinh";
+    var items = Model.ToList();
+    var linkForm = (FapWeb.Models.Dtos.UserManagementDtos.GuardianLinkFormDto)ViewBag.LinkForm;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@ViewData["Title"]</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Quản lý tài khoản</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h5 class="card-title mb-3">Tạo liên kết mới</h5>
+            <form asp-action="LinkGuardian" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <div class="col-md-4">
+                    <label class="form-label">Học sinh</label>
+                    <select name="StudentId" class="form-select" required>
+                        <option value="">-- Chọn học sinh --</option>
+                        @foreach (var option in linkForm.StudentOptions)
+                        {
+                            <option value="@option.Value">@option.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Phụ huynh</label>
+                    <select name="GuardianId" class="form-select" required>
+                        <option value="">-- Chọn phụ huynh --</option>
+                        @foreach (var option in linkForm.GuardianOptions)
+                        {
+                            <option value="@option.Value">@option.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Quan hệ</label>
+                    <select name="RelationshipId" class="form-select">
+                        <option value="">-- Chọn --</option>
+                        @foreach (var option in linkForm.RelationshipOptions)
+                        {
+                            <option value="@option.Value">@option.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <div class="form-check mb-2">
+                        <input type="checkbox" name="IsPrimary" value="true" class="form-check-input" id="isPrimary" />
+                        <label class="form-check-label" for="isPrimary">Chính</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-1">Liên kết</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!items.Any())
+    {
+        <div class="alert alert-info shadow-sm">Chưa có liên kết phụ huynh – học sinh nào.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Học sinh</th>
+                        <th>Phụ huynh</th>
+                        <th>SĐT phụ huynh</th>
+                        <th>Quan hệ</th>
+                        <th>Giám hộ chính</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.StudentName</td>
+                            <td>@item.GuardianName</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.GuardianPhone) ? "N/A" : item.GuardianPhone)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.RelationshipName) ? "N/A" : item.RelationshipName)</td>
+                            <td>
+                                @if (item.IsPrimary)
+                                {
+                                    <span class="badge bg-success">Có</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <form asp-action="RemoveGuardianLink" method="post" class="d-inline"
+                                      onsubmit="return confirm('Xóa liên kết này?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="linkId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

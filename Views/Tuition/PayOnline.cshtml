@@ -1,0 +1,30 @@
+@model FapWeb.Models.Dtos.SePayDtos.SePayCheckoutFormDto
+
+@{
+    ViewData["Title"] = "Chuyển đến cổng thanh toán";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow-sm border-0 rounded-4 mx-auto" style="max-width: 480px;">
+        <div class="card-body p-5">
+            <div class="spinner-border text-primary mb-3" role="status"></div>
+            <h4 class="mb-2">Đang chuyển đến cổng thanh toán SePay...</h4>
+            <p class="text-muted small mb-4">Vui lòng không tắt trình duyệt trong quá trình chuyển hướng.</p>
+
+            @* Thứ tự input phải giữ nguyên như chuỗi đã ký, không được thay đổi *@
+            <form id="sepay-checkout-form" action="@Model.ActionUrl" method="POST">
+                @foreach (var field in Model.Fields)
+                {
+                    <input type="hidden" name="@field.Key" value="@field.Value" />
+                }
+                <button type="submit" class="btn btn-primary">Bấm vào đây nếu không tự chuyển hướng</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("sepay-checkout-form").submit();
+    </script>
+}

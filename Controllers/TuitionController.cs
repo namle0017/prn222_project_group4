@@ -30,6 +30,57 @@ namespace FapWeb.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> CreateFee()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var model = await _tuitionService.GetCreateFeeModelAsync(userId.Value, GetCurrentRoleName());
+            if (model == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateFee(TuitionFeeCreateDto request)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var refreshed = await _tuitionService.GetCreateFeeModelAsync(userId.Value, GetCurrentRoleName());
+                request.ClassOptions = refreshed?.ClassOptions ?? new();
+                return View(request);
+            }
+
+            var (created, skipped, error) = await _tuitionService.GenerateClassFeesAsync(request, userId.Value, GetCurrentRoleName());
+
+            if (error != null)
+            {
+                TempData["ErrorMessage"] = error;
+            }
+            else
+            {
+                TempData["SuccessMessage"] = skipped > 0
+                    ? $"Đã tạo {created} khoản học phí. Bỏ qua {skipped} học sinh đã có học phí tháng này."
+                    : $"Đã tạo {created} khoản học phí cho cả lớp.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
         public async Task<IActionResult> CreatePayment(Guid tuitionFeeId)
         {
             var userId = GetCurrentUserId();
@@ -81,6 +132,54 @@ namespace FapWeb.Controllers
 
             var history = await _tuitionService.GetPaymentHistoryAsync(userId.Value, GetCurrentRoleName(), tuitionFeeId);
             return View(history);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PayOnline(Guid tuitionFeeId)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var baseCallbackUrl = $"{Request.Scheme}://{Request.Host}";
+            var checkoutForm = await _tuitionService.CreateOnlinePaymentAsync(tuitionFeeId, userId.Value, GetCurrentRoleName(), baseCallbackUrl);
+
+            if (checkoutForm == null)
+            {
+                TempData["ErrorMessage"] = "Không thể tạo thanh toán online cho khoản học phí này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(checkoutForm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PaymentCallback(string invoice, string result)
+        {
+            var statusName = result?.ToLowerInvariant() switch
+            {
+                "success" => "SUCCESS",
+                "cancel" => "CANCELLED",
+                _ => "FAILED"
+            };
+
+            var isSuccess = await _tuitionService.FinalizeOnlinePaymentAsync(invoice, statusName);
+
+            if (isSuccess)
+            {
+                TempData["SuccessMessage"] = "Thanh toán học phí qua SePay thành công.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = statusName == "CANCELLED"
+                    ? "Giao dịch đã bị hủy."
+                    : "Thanh toán không thành công hoặc giao dịch không hợp lệ.";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]

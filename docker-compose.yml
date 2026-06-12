@@ -1,0 +1,16 @@
+services:
+  fapweb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fapweb
+    ports:
+      - "8080:8080"
+    # Đọc secrets từ file .env (copy từ .env.example và điền giá trị).
+    # File .env không bắt buộc: nếu đã có appsettings.json thì có thể bỏ qua.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    restart: unless-stopped

@@ -1,5 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Warm paper-soft canvas over pure white */
+  --bg-primary: #f6f5f4;
+  --bg-secondary: #ffffff;
+  
+  /* Near-black text and supporting scale */
+  --text-primary: #000000;
+  --text-secondary: #31302e;
+  --text-muted: #615d59;
+  --text-faint: #a39e98;
+  
+  /* Hairline border */
+  --border-color: #e6e6e6;
+  
+  /* Notion Blue structural accent */
+  --primary-color: #0075de;
+  --primary-glow: rgba(0, 117, 222, 0.15);
+  --primary-active: #005bab;
+  --primary-gradient: linear-gradient(135deg, #0075de 0%, #005bab 100%);
+  
+  /* Deep Indigo brand band */
+  --secondary-color: #213183;
+  --secondary-gradient: linear-gradient(135deg, #213183 0%, #17225c 100%);
+  
+  /* Sticker palette accents */
+  --accent-sky: #62aef0;
+  --accent-purple: #d6b6f6;
+  --accent-teal: #2a9d99;
+  --accent-green: #1aae39;
+  --accent-orange: #dd5b00;
+  --accent-pink: #ff64c8;
+  --accent-brown: #523410;
+  
+  /* Radii scale */
+  --radius-xs: 4px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows (layered barely-there shadows) */
+  --shadow-flat: none;
+  --shadow-soft: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03);
+  --shadow-elevated: 0 8px 24px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02);
+}
+
 html {
   font-size: 14px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,15 +59,292 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
   margin-bottom: 60px;
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #e6e6e6;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d4;
+}
+
+/* Notion surface card styling */
+.card, .list-group-item {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important; /* 12px */
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--text-secondary) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(0, 117, 222, 0.25) !important;
+  box-shadow: var(--shadow-elevated) !important;
+  transform: none !important; /* Keep it quiet like Notion */
+}
+
+/* Typography voice: tight, heavy, quiet-confident */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  background: none !important;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2.2rem;
+  letter-spacing: -1px;
+}
+
+h2 {
+  font-size: 1.75rem;
+  letter-spacing: -0.625px;
+}
+
+h3 {
+  font-size: 1.4rem;
+  letter-spacing: -0.25px;
+}
+
+.text-muted, .text-muted.small {
+  color: var(--text-muted) !important;
+}
+
+/* Notion Tables */
+.table {
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+  border-bottom-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  padding: 0.75rem 1rem !important;
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(0, 0, 0, 0.01) !important;
+}
+.table-hover > tbody > tr:hover > * {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+.table thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border-color) !important;
+}
+
+/* Primary CTA Button */
+.btn-primary {
+  background: var(--primary-color) !important;
+  border: none !important;
+  border-radius: var(--radius-full) !important; /* Pill shaped marketing CTA */
+  font-weight: 500;
+  padding: 0.6rem 1.4rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: background-color 0.2s ease;
+  color: #ffffff !important;
+}
+.btn-primary:hover {
+  background-color: var(--primary-active) !important;
+  opacity: 1;
+  transform: none !important;
+}
+
+/* Secondary CTA / Utility Button */
+.btn-outline-primary {
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  background-color: var(--bg-secondary) !important;
+  border-radius: var(--radius-md) !important; /* Tight 8px for utility */
+  padding: 0.6rem 1.2rem;
+  box-shadow: var(--shadow-soft) !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-outline-primary:hover {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.btn-outline-secondary {
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  background-color: var(--bg-secondary) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.6rem 1.2rem;
+  transition: background-color 0.2s ease;
+}
+.btn-outline-secondary:hover {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-outline-danger {
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  color: #ef4444 !important;
+  background-color: var(--bg-secondary) !important;
+  border-radius: var(--radius-md) !important;
+  transition: background-color 0.2s ease;
+}
+.btn-outline-danger:hover {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+  color: #ef4444 !important;
+}
+
+/* Form inputs (Deliberately tighter 4px radius) */
+.form-control, .form-select {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-xs) !important; /* 4px */
+  padding: 0.6rem 0.85rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px var(--primary-glow) !important;
+}
+.form-control::placeholder {
+  color: var(--text-faint) !important;
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+}
+.navbar-brand {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: var(--text-primary) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  letter-spacing: -0.5px;
+}
+.nav-link {
+  color: var(--text-muted) !important;
+  font-weight: 500;
+  font-size: 15px;
+  transition: color 0.15s ease;
+  margin-right: 0.5rem;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--text-primary) !important;
+}
+.nav-link.active {
+  color: var(--primary-color) !important;
+}
+
+/* Badges & Alerts using the Sticker Palette */
+.badge {
+  padding: 0.45em 0.75em;
+  font-weight: 600;
+  font-size: 12px;
+  border-radius: var(--radius-sm); /* 5px */
+}
+.bg-success {
+  background-color: rgba(26, 174, 57, 0.1) !important;
+  color: var(--accent-green) !important;
+  border: 1px solid rgba(26, 174, 57, 0.2) !important;
+}
+.bg-danger {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+}
+.bg-warning {
+  background-color: rgba(221, 91, 0, 0.08) !important;
+  color: var(--accent-orange) !important;
+  border: 1px solid rgba(221, 91, 0, 0.15) !important;
+}
+
+.alert-info {
+  background-color: rgba(0, 117, 222, 0.05) !important;
+  border-color: rgba(0, 117, 222, 0.12) !important;
+  color: var(--primary-color) !important;
+  border-radius: var(--radius-md);
+}
+
+.alert-success {
+  background-color: rgba(26, 174, 57, 0.06) !important;
+  border-color: rgba(26, 174, 57, 0.12) !important;
+  color: var(--accent-green) !important;
+  border-radius: var(--radius-md);
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+  border-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  border-radius: var(--radius-md);
+}
+
+footer {
+  background-color: var(--bg-primary) !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+
+/* Glass override for Bootstrap's default table-dark thead */
+.table-dark, thead.table-dark, thead.table-dark th {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+  color: var(--text-muted) !important;
+  border-bottom: 2px solid var(--border-color) !important;
+}
+
+/* Sticker accents decoration helpers */
+.accent-dot-sky { background-color: var(--accent-sky); }
+.accent-dot-purple { background-color: var(--accent-purple); }
+.accent-dot-teal { background-color: var(--accent-teal); }
+.accent-dot-orange { background-color: var(--accent-orange); }
+
+/* Deep Indigo night mode band for hero banner */
+.hero-band-notion {
+  background: var(--secondary-gradient);
+  color: #ffffff !important;
+  border-radius: var(--radius-xl);
+  padding: 3rem;
+}
+.hero-band-notion h1, .hero-band-notion h2, .hero-band-notion h3 {
+  color: #ffffff !important;
+}
+.hero-band-notion .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+.hero-band-notion .hero-glass-card {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+}
+.hero-band-notion .hero-glass-card h5 {
+  color: #ffffff !important;
+}
+.hero-band-notion .hero-glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
 }

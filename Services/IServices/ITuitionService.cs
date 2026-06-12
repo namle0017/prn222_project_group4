@@ -1,3 +1,4 @@
+using FapWeb.Models.Dtos.SePayDtos;
 using FapWeb.Models.Dtos.TuitionDtos;
 
 namespace FapWeb.Services.IServices
@@ -13,5 +14,13 @@ namespace FapWeb.Services.IServices
         Task<List<PaymentHistoryDto>> GetPaymentHistoryAsync(Guid currentUserId, string? roleName, Guid? tuitionFeeId = null);
 
         Task<bool> SendTuitionReminderAsync(Guid tuitionFeeId, Guid teacherId, string? roleName);
+
+        Task<TuitionFeeCreateDto?> GetCreateFeeModelAsync(Guid currentUserId, string? roleName);
+
+        Task<(int Created, int Skipped, string? Error)> GenerateClassFeesAsync(TuitionFeeCreateDto request, Guid currentUserId, string? roleName);
+
+        Task<SePayCheckoutFormDto?> CreateOnlinePaymentAsync(Guid tuitionFeeId, Guid currentUserId, string? roleName, string baseCallbackUrl);
+
+        Task<bool> FinalizeOnlinePaymentAsync(string invoiceNumber, string statusName);
     }
 }

@@ -1,8 +1,124 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Trang chủ";
+    var sessionUserId = Context.Session.GetString("UserId");
+    var sessionRoleName = Context.Session.GetString("RoleName");
+    var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-5">
+    <!-- Hero Indigo Notion Band -->
+    <div class="hero-band-notion p-5 mb-5 shadow-sm border-0 position-relative overflow-hidden">
+        <div class="row align-items-center position-relative" style="z-index: 2;">
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-4 fw-extrabold mb-3 text-white" style="letter-spacing: -1.5px;">
+                    Hệ Thống Quản Lý <br/>
+                    <span>FapWeb Portal</span>
+                </h1>
+                <p class="lead text-white-50 mb-4" style="max-width: 580px;">
+                    Hệ thống quản lý trường học tinh gọn thiết kế theo ngôn ngữ tối giản Notion. Kết nối nhà trường, giáo viên, phụ huynh và học sinh trên một trang giấy kỹ thuật số.
+                </p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    @if (isLoggedIn)
+                    {
+                        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg px-4 py-3">
+                            Vào Dashboard <span class="ms-2">→</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg px-4 py-3">
+                            Đăng Nhập Ngay
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4 py-3" style="border-radius: var(--radius-full); font-weight: 500;">
+                            Khám Phá Tính Năng
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-5 mt-5 mt-lg-0">
+                <div class="card hero-glass-card p-4 border-0 rounded-4 shadow-lg text-start mx-auto" style="max-width: 440px;">
+                    <h5 class="mb-3 text-white fw-bold">Cổng Thông Tin Trường Học</h5>
+                    <div class="mb-3 d-flex align-items-center">
+                        <span class="badge text-white me-2" style="background-color: var(--accent-sky) !important;">🔐</span>
+                        <span class="text-white-50 small">Đăng nhập bằng số điện thoại và mật khẩu được nhà trường cấp.</span>
+                    </div>
+                    <div class="mb-3 d-flex align-items-center">
+                        <span class="badge text-white me-2" style="background-color: var(--accent-purple) !important;">👥</span>
+                        <span class="text-white-50 small">Phân quyền riêng cho Admin, Giáo viên, Phụ huynh và Học sinh.</span>
+                    </div>
+                    <div class="mb-0 d-flex align-items-center">
+                        <span class="badge text-white me-2" style="background-color: var(--accent-teal) !important;">🛡️</span>
+                        <span class="text-white-50 small">Quên mật khẩu? Vui lòng liên hệ quản trị viên nhà trường để được cấp lại.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Background sticker constellations -->
+        <div class="position-absolute" style="top: 10%; right: 10%; font-size: 3rem; opacity: 0.15;">✨</div>
+        <div class="position-absolute" style="bottom: 15%; left: 5%; font-size: 2.5rem; opacity: 0.1;">🌟</div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="pt-4">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">6 Phân Hệ Cốt Lõi</h2>
+            <p class="text-muted">Được thiết kế tối giản, trực quan và đầy đủ tính năng nghiệp vụ</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- 1. Authentication -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 position-relative">
+                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-sky mb-3"></div>
+                    <h4 class="fw-bold">🔐 Xác Thực & Phân Quyền</h4>
+                    <p class="text-muted small">Hỗ trợ cơ chế bảo mật phiên làm việc nghiêm ngặt và phân quyền chi tiết cho Admin, Giáo viên, Phụ huynh và Học sinh.</p>
+                </div>
+            </div>
+
+            <!-- 2. Class Management -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 position-relative">
+                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-purple mb-3"></div>
+                    <h4 class="fw-bold">🏫 Quản Lý Lớp Học</h4>
+                    <p class="text-muted small">Cho phép tạo lớp mới, gán giáo viên phụ trách, xếp lịch học trực quan và kết nạp/loại trừ danh sách học viên.</p>
+                </div>
+            </div>
+
+            <!-- 3. Tuition Management -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 position-relative">
+                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-teal mb-3"></div>
+                    <h4 class="fw-bold">💳 Quản Lý Học Phí</h4>
+                    <p class="text-muted small">Ghi nhận giao dịch đóng tiền học phí nhanh chóng, tự động tính toán dư nợ còn lại và lập lịch sử chi tiết.</p>
+                </div>
+            </div>
+
+            <!-- 4. Attendance -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 position-relative">
+                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-orange mb-3"></div>
+                    <h4 class="fw-bold">📝 Điểm Danh Học Sinh</h4>
+                    <p class="text-muted small">Hỗ trợ giáo viên điểm danh nhanh cho lớp học, thống kê tỷ lệ phần trăm chuyên cần, số buổi học/nghỉ thực tế.</p>
+                </div>
+            </div>
+
+            <!-- 5. Notifications -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 position-relative">
+                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-sky mb-3"></div>
+                    <h4 class="fw-bold">🔔 Hệ Thống Thông Báo</h4>
+                    <p class="text-muted small">Cung cấp cơ chế tự động gửi cảnh báo học phí trễ hạn và thông báo nghỉ học không phép ngay lập tức.</p>
+                </div>
+            </div>
+
+            <!-- 6. Dashboard -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 position-relative">
+                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-purple mb-3"></div>
+                    <h4 class="fw-bold">📊 Dashboard Đa Chiều</h4>
+                    <p class="text-muted small">Bảng tổng hợp dữ liệu học tập thông minh cho học viên và biểu đồ theo dõi công nợ học phí tiện lợi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
