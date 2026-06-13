@@ -156,11 +156,7 @@ namespace FapWeb.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Xây dựng URL chuyển hướng trực tiếp (GET redirect) với query parameters
-            var queryParams = string.Join("&", checkoutForm.Fields.Select(f => $"{f.Key}={Uri.EscapeDataString(f.Value)}"));
-            var redirectUrl = $"{checkoutForm.ActionUrl}?{queryParams}";
-
-            return Redirect(redirectUrl);
+            return View(checkoutForm);
         }
 
         [HttpGet]
