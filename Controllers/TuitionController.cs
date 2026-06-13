@@ -1,6 +1,7 @@
 using FapWeb.Models.Dtos.TuitionDtos;
 using FapWeb.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace FapWeb.Controllers
 {
@@ -10,10 +11,12 @@ namespace FapWeb.Controllers
         private const string RoleNameSessionKey = "RoleName";
 
         private readonly ITuitionService _tuitionService;
+        private readonly IConfiguration _configuration;
 
-        public TuitionController(ITuitionService tuitionService)
+        public TuitionController(ITuitionService tuitionService, IConfiguration configuration)
         {
             _tuitionService = tuitionService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -144,7 +147,7 @@ namespace FapWeb.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            var baseCallbackUrl = $"{Request.Scheme}://{Request.Host}";
+            var baseCallbackUrl = _configuration["BaseCallbackUrl"] ?? $"{Request.Scheme}://{Request.Host}";
             var checkoutForm = await _tuitionService.CreateOnlinePaymentAsync(tuitionFeeId, userId.Value, GetCurrentRoleName(), baseCallbackUrl);
 
             if (checkoutForm == null)
