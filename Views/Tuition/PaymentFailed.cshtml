@@ -1,0 +1,44 @@
+@model FapWeb.Models.Dtos.SePayDtos.SePayCheckoutFormDto
+
+@{
+    ViewData["Title"] = "Thanh toán không thành công";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow border-0 rounded-4 mx-auto" style="max-width: 500px;">
+        <div class="card-body p-5">
+            <div class="text-danger mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                </svg>
+            </div>
+            
+            <h3 class="mb-3 text-dark fw-bold">Thanh toán thất bại</h3>
+            <p class="text-muted mb-4">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    @TempData["ErrorMessage"]
+                }
+                else
+                {
+                    <span>Giao dịch thanh toán trực tuyến không thành công hoặc đã bị hủy.</span>
+                }
+            </p>
+
+            <div class="d-grid gap-3">
+                <form id="sepay-checkout-form" action="@Model.ActionUrl" method="POST">
+                    @foreach (var field in Model.Fields)
+                    {
+                        <input type="hidden" name="@field.Key" value="@field.Value" />
+                    }
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3">
+                        Thử thanh toán lại ngay
+                    </button>
+                </form>
+                <a asp-action="Index" class="btn btn-outline-secondary py-2.5 rounded-3">
+                    Quay về danh sách học phí
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
