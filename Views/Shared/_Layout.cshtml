@@ -4,23 +4,35 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FapWeb</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FapWeb.styles.css" asp-append-version="true" />
 </head>
-<body>
-    @{
-        var sessionUserId = Context.Session.GetString(AppSessionKeys.UserId);
-        var sessionRoleName = Context.Session.GetString(AppSessionKeys.RoleName);
-        var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
-        var isStaff = AppRoles.IsStaff(sessionRoleName);
-        var isAdmin = AppRoles.IsAdmin(sessionRoleName);
-        var canViewStudentAreas = AppRoles.IsParent(sessionRoleName) || AppRoles.IsStudent(sessionRoleName);
-    }
+@{
+    var sessionUserId = Context.Session.GetString(AppSessionKeys.UserId);
+    var sessionRoleName = Context.Session.GetString(AppSessionKeys.RoleName);
+    var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
+    var isStaff = AppRoles.IsStaff(sessionRoleName);
+    var isAdmin = AppRoles.IsAdmin(sessionRoleName);
+    var canViewStudentAreas = AppRoles.IsParent(sessionRoleName) || AppRoles.IsStudent(sessionRoleName);
+
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var isHomePage = string.Equals(controller, "Home", StringComparison.OrdinalIgnoreCase) && 
+                     string.Equals(action, "Index", StringComparison.OrdinalIgnoreCase);
+
+    var bodyClass = isHomePage ? "canvas-dark" : "canvas-light";
+    var navbarClass = isHomePage ? "nav-bar-dark navbar-dark" : "nav-bar-light navbar-light";
+    var btnThemeClass = isHomePage ? "btn-inverted" : "btn-primary";
+}
+<body class="@bodyClass">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-4">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm @navbarClass">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FapWeb</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FAPWEB</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -28,69 +40,69 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         @if (isLoggedIn)
                         {
                             @if (isStaff)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="ClassManagement" asp-action="Index">Classes</a>
+                                    <a class="nav-link" asp-controller="ClassManagement" asp-action="Index">Classes</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="ScheduleManagement" asp-action="Index">Schedule</a>
+                                    <a class="nav-link" asp-controller="ScheduleManagement" asp-action="Index">Schedule</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Attendance" asp-action="Index">Attendance</a>
+                                    <a class="nav-link" asp-controller="Attendance" asp-action="Index">Attendance</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Tuition" asp-action="Index">Tuition</a>
+                                    <a class="nav-link" asp-controller="Tuition" asp-action="Index">Tuition</a>
                                 </li>
                             }
 
                             @if (isAdmin)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Transaction" asp-action="Index">Transactions</a>
+                                    <a class="nav-link" asp-controller="Transaction" asp-action="Index">Transactions</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a>
+                                    <a class="nav-link" asp-controller="User" asp-action="Index">Users</a>
                                 </li>
                             }
 
                             @if (canViewStudentAreas || isStaff)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Notification" asp-action="Index">Notifications</a>
+                                    <a class="nav-link" asp-controller="Notification" asp-action="Index">Notifications</a>
                                 </li>
                             }
 
                             @if (canViewStudentAreas)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Attendance" asp-action="History">Attendance History</a>
+                                    <a class="nav-link" asp-controller="Attendance" asp-action="History">Attendance History</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Tuition" asp-action="History">Payment History</a>
+                                    <a class="nav-link" asp-controller="Tuition" asp-action="History">Payment History</a>
                                 </li>
                             }
 
                             @if (!AppRoles.IsStaff(sessionRoleName))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Transaction" asp-action="MyHistory">My Transactions</a>
+                                    <a class="nav-link" asp-controller="Transaction" asp-action="MyHistory">My Transactions</a>
                                 </li>
                             }
                         }
                     </ul>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-3">
                         @if (isLoggedIn)
                         {
-                            <span class="text-muted small">
-                                Signed in as @sessionRoleName
+                            <span class="@(isHomePage ? "text-white-50" : "text-muted") small">
+                                Signed in as <strong>@sessionRoleName</strong>
                             </span>
                             <a class="btn btn-outline-secondary btn-sm" asp-controller="Auth" asp-action="ChangePassword">Change Password</a>
                             <form asp-controller="Auth" asp-action="Logout" method="post" class="mb-0">
@@ -100,7 +112,7 @@
                         }
                         else
                         {
-                            <a class="btn btn-outline-primary btn-sm" asp-controller="Auth" asp-action="Login">Login</a>
+                            <a class="btn @btnThemeClass btn-sm" asp-controller="Auth" asp-action="Login">Login</a>
                         }
                     </div>
                 </div>
@@ -108,14 +120,28 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Sentry Signature: Lime Squiggly Footer Divider -->
+    <div class="container-fluid px-0">
+        <svg class="squiggly-divider" viewBox="0 0 1440 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 12C120 12 180 4 300 4C420 4 480 20 600 20C720 20 780 4 900 4C1020 4 1080 20 1200 20C1320 20 1380 12 1440 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <footer class="footer">
         <div class="container">
-            &copy; 2026 - FapWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    &copy; 2026 - FapWeb - <a class="@(isHomePage ? "link-on-dark" : "link-on-light")" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <span class="small @(isHomePage ? "text-white-50" : "text-muted")">Sentry-Inspired Debug Console Edition</span>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

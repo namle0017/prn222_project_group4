@@ -5,118 +5,185 @@
     var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
 }
 
-<div class="container py-5">
-    <!-- Hero Indigo Notion Band -->
-    <div class="hero-band-notion p-5 mb-5 shadow-sm border-0 position-relative overflow-hidden">
-        <div class="row align-items-center position-relative" style="z-index: 2;">
-            <div class="col-lg-7 text-center text-lg-start">
-                <h1 class="display-4 fw-extrabold mb-3 text-white" style="letter-spacing: -1.5px;">
-                    Hệ Thống Quản Lý <br/>
-                    <span>FapWeb Portal</span>
-                </h1>
-                <p class="lead text-white-50 mb-4" style="max-width: 580px;">
-                    Hệ thống quản lý trường học tinh gọn thiết kế theo ngôn ngữ tối giản Notion. Kết nối nhà trường, giáo viên, phụ huynh và học sinh trên một trang giấy kỹ thuật số.
-                </p>
-                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
-                    @if (isLoggedIn)
-                    {
-                        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg px-4 py-3">
-                            Vào Dashboard <span class="ms-2">→</span>
-                        </a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg px-4 py-3">
-                            Đăng Nhập Ngay
-                        </a>
-                        <a href="#features" class="btn btn-outline-light btn-lg px-4 py-3" style="border-radius: var(--radius-full); font-weight: 500;">
-                            Khám Phá Tính Năng
-                        </a>
-                    }
-                </div>
-            </div>
-            <div class="col-lg-5 mt-5 mt-lg-0">
-                <div class="card hero-glass-card p-4 border-0 rounded-4 shadow-lg text-start mx-auto" style="max-width: 440px;">
-                    <h5 class="mb-3 text-white fw-bold">Cổng Thông Tin Trường Học</h5>
-                    <div class="mb-3 d-flex align-items-center">
-                        <span class="badge text-white me-2" style="background-color: var(--accent-sky) !important;">🔐</span>
-                        <span class="text-white-50 small">Đăng nhập bằng số điện thoại và mật khẩu được nhà trường cấp.</span>
-                    </div>
-                    <div class="mb-3 d-flex align-items-center">
-                        <span class="badge text-white me-2" style="background-color: var(--accent-purple) !important;">👥</span>
-                        <span class="text-white-50 small">Phân quyền riêng cho Admin, Giáo viên, Phụ huynh và Học sinh.</span>
-                    </div>
-                    <div class="mb-0 d-flex align-items-center">
-                        <span class="badge text-white me-2" style="background-color: var(--accent-teal) !important;">🛡️</span>
-                        <span class="text-white-50 small">Quên mật khẩu? Vui lòng liên hệ quản trị viên nhà trường để được cấp lại.</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Background sticker constellations -->
-        <div class="position-absolute" style="top: 10%; right: 10%; font-size: 3rem; opacity: 0.15;">✨</div>
-        <div class="position-absolute" style="bottom: 15%; left: 5%; font-size: 2.5rem; opacity: 0.1;">🌟</div>
+<!-- Hero Area with Starfield Background -->
+<div class="starfield-hero position-relative py-5 px-4 px-md-5 mb-5 rounded-4 border border-secondary" style="border-color: var(--colors-hairline-violet) !important;">
+    
+    <!-- Floating Sticker Mascots -->
+    <div class="sticker-mascot d-none d-md-block" style="top: 15%; left: 3%; transform: rotate(-8deg);">
+        👨‍🚀 FAP_DEB_AGENT
+    </div>
+    <div class="sticker-mascot lime-outline d-none d-lg-block" style="top: 10px; right: 28%; transform: rotate(4deg);">
+        ⚠️ WARNING: ATTENDANCE_ACTIVE
+    </div>
+    <div class="sticker-mascot d-none d-md-block" style="bottom: 12%; right: 4%; transform: rotate(6deg);">
+        👾 BUG_CRUSHER_v8.0
     </div>
 
-    <!-- Features Section -->
-    <div id="features" class="pt-4">
-        <div class="text-center mb-5">
-            <h2 class="display-6 fw-bold">6 Phân Hệ Cốt Lõi</h2>
-            <p class="text-muted">Được thiết kế tối giản, trực quan và đầy đủ tính năng nghiệp vụ</p>
+    <div class="row align-items-center position-relative py-5" style="z-index: 2;">
+        <div class="col-lg-7 text-center text-lg-start">
+            <div class="eyebrow text-uppercase mb-3" style="color: var(--colors-accent-pink); font-weight: 600;">
+                // OBSERVABILITY FOR EDUCATION
+            </div>
+            
+            <h1 class="display-hero mb-4 text-white">
+                HỆ THỐNG QUẢN LÝ <br/>
+                <span class="chip-lime-keyword">FAPWEB</span> PORTAL
+            </h1>
+            
+            <p class="body-lg text-white-50 mb-5" style="max-width: 580px;">
+                Trang điều hành thông tin học tập và giao dịch chuyên sâu. Giám sát thời gian thực, tự động gửi cảnh báo điểm danh và nợ học phí qua WebSocket SignalR trực tiếp tới phụ huynh.
+            </p>
+            
+            <div class="d-flex gap-3 justify-content-center justify-content-lg-start align-items-center">
+                @if (isLoggedIn)
+                {
+                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-inverted btn-lg px-4 py-3">
+                        Vào Dashboard <span class="ms-2">→</span>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-inverted btn-lg px-4 py-3">
+                        Đăng Nhập Ngay
+                    </a>
+                    <a href="#features" class="btn btn-ghost-on-dark btn-lg px-4 py-3">
+                        Khám Phá Tính Năng
+                    </a>
+                }
+            </div>
+        </div>
+        
+        <!-- Tilted Window-Chrome UI Mockup -->
+        <div class="col-lg-5 mt-5 mt-lg-0 d-flex justify-content-center">
+            <div class="window-chrome tilted-chrome w-100" style="max-width: 460px;">
+                <div class="window-chrome-header">
+                    <div class="window-chrome-dot red"></div>
+                    <div class="window-chrome-dot yellow"></div>
+                    <div class="window-chrome-dot green"></div>
+                    <span class="ms-2 small text-white-50" style="font-family: var(--font-code); font-size: 11px;">console_output.log</span>
+                </div>
+                
+                <div class="code-block m-0 p-3" style="font-size: 13px; max-height: 250px; overflow-y: auto;">
+<span style="color: var(--colors-accent-pink);">[FapWeb System Initialization]</span>
+> Initializing Database Context... OK (PostgresSQL)
+> Connecting NotificationHub WebSocket... ACTIVE
+> Ready for role-based sessions.
+
+<span style="color: var(--colors-accent-lime);">[Live Feed - Class Schedule]</span>
+ID: SE1801-PRN222 | Attendance: 98%
+Status: <span class="badge bg-success py-1 px-2" style="font-size: 9px;">Checked-in</span>
+
+<span style="color: var(--colors-accent-pink);">[SignalR Alerts Channel]</span>
+> Broadcast: Sent warning to Guardian (ID: 9912)
+> Message: "Student absent from SE1801 Session 3"
+> Delivery latency: 12ms.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div id="features" class="py-5">
+    <div class="text-center mb-5">
+        <div class="eyebrow text-uppercase mb-2" style="color: var(--colors-accent-lime);">[ MODULES_OVERVIEW ]</div>
+        <h2 class="display-large text-white">6 Phân Hệ Giám Sát Cốt Lõi</h2>
+        <p class="body-lg text-white-50" style="max-width: 600px; margin: 0 auto;">Cơ chế kiểm soát chặt chẽ, tối giản hóa thao tác vận hành.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- 1. Authentication -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card-feature-dark d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success">AUTH_TOKEN</span>
+                        <span style="font-family: var(--font-code); color: var(--colors-accent-pink); font-size: 13px;">// 01</span>
+                    </div>
+                    <h4 class="heading-sm mb-3 text-white">🔐 Xác Thực &amp; Phân Quyền</h4>
+                    <p class="body-md text-white-50" style="font-size: 14px;">
+                        Cơ chế lưu trữ Session an toàn, kiểm soát truy cập phân lớp cho Admin, Staff (Giáo viên), Phụ huynh và Học sinh.
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <div class="row g-4">
-            <!-- 1. Authentication -->
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 position-relative">
-                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-sky mb-3"></div>
-                    <h4 class="fw-bold">🔐 Xác Thực & Phân Quyền</h4>
-                    <p class="text-muted small">Hỗ trợ cơ chế bảo mật phiên làm việc nghiêm ngặt và phân quyền chi tiết cho Admin, Giáo viên, Phụ huynh và Học sinh.</p>
+        <!-- 2. Class Management -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card-feature-dark d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-warning">CLASS_MGMT</span>
+                        <span style="font-family: var(--font-code); color: var(--colors-accent-lime); font-size: 13px;">// 02</span>
+                    </div>
+                    <h4 class="heading-sm mb-3 text-white">🏫 Quản Lý Lớp Học</h4>
+                    <p class="body-md text-white-50" style="font-size: 14px;">
+                        Thiết lập sĩ số, điều phối danh sách học sinh và phân bổ giáo viên chủ nhiệm giảng dạy qua giao diện console tối giản.
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- 2. Class Management -->
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 position-relative">
-                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-purple mb-3"></div>
-                    <h4 class="fw-bold">🏫 Quản Lý Lớp Học</h4>
-                    <p class="text-muted small">Cho phép tạo lớp mới, gán giáo viên phụ trách, xếp lịch học trực quan và kết nạp/loại trừ danh sách học viên.</p>
+        <!-- 3. Tuition Management -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card-feature-dark d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger">FINANCE_LEDGER</span>
+                        <span style="font-family: var(--font-code); color: var(--colors-accent-pink); font-size: 13px;">// 03</span>
+                    </div>
+                    <h4 class="heading-sm mb-3 text-white">💳 Kiểm Soát Học Phí</h4>
+                    <p class="body-md text-white-50" style="font-size: 14px;">
+                        Theo dõi công nợ học kỳ tự động, cập nhật lịch sử hóa đơn tức thì, tính toán số dư chưa thanh toán với độ trễ tối thiểu.
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- 3. Tuition Management -->
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 position-relative">
-                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-teal mb-3"></div>
-                    <h4 class="fw-bold">💳 Quản Lý Học Phí</h4>
-                    <p class="text-muted small">Ghi nhận giao dịch đóng tiền học phí nhanh chóng, tự động tính toán dư nợ còn lại và lập lịch sử chi tiết.</p>
+        <!-- 4. Attendance -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card-feature-dark d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success">ATTENDANCE</span>
+                        <span style="font-family: var(--font-code); color: var(--colors-accent-lime); font-size: 13px;">// 04</span>
+                    </div>
+                    <h4 class="heading-sm mb-3 text-white">📝 Điểm Danh Chuyên Cần</h4>
+                    <p class="body-md text-white-50" style="font-size: 14px;">
+                        Giao diện ghi nhận chuyên cần nhanh theo nhóm lớp, thống kê tỉ lệ chuyên cần chính xác qua biểu đồ trực quan.
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- 4. Attendance -->
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 position-relative">
-                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-orange mb-3"></div>
-                    <h4 class="fw-bold">📝 Điểm Danh Học Sinh</h4>
-                    <p class="text-muted small">Hỗ trợ giáo viên điểm danh nhanh cho lớp học, thống kê tỷ lệ phần trăm chuyên cần, số buổi học/nghỉ thực tế.</p>
+        <!-- 5. Notifications -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card-feature-dark d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-warning">SIGNALR_PUSH</span>
+                        <span style="font-family: var(--font-code); color: var(--colors-accent-pink); font-size: 13px;">// 05</span>
+                    </div>
+                    <h4 class="heading-sm mb-3 text-white">🔔 Cảnh Báo WebSocket</h4>
+                    <p class="body-md text-white-50" style="font-size: 14px;">
+                        Thông báo tự động gửi về điện thoại phụ huynh qua SignalR Hub khi học sinh vắng học hoặc trễ kỳ hạn đóng học phí.
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- 5. Notifications -->
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 position-relative">
-                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-sky mb-3"></div>
-                    <h4 class="fw-bold">🔔 Hệ Thống Thông Báo</h4>
-                    <p class="text-muted small">Cung cấp cơ chế tự động gửi cảnh báo học phí trễ hạn và thông báo nghỉ học không phép ngay lập tức.</p>
-                </div>
-            </div>
-
-            <!-- 6. Dashboard -->
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 position-relative">
-                    <div style="width: 24px; height: 6px; border-radius: 3px;" class="accent-dot-purple mb-3"></div>
-                    <h4 class="fw-bold">📊 Dashboard Đa Chiều</h4>
-                    <p class="text-muted small">Bảng tổng hợp dữ liệu học tập thông minh cho học viên và biểu đồ theo dõi công nợ học phí tiện lợi.</p>
+        <!-- 6. Dashboard -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card-feature-dark d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger">METRICS_SYS</span>
+                        <span style="font-family: var(--font-code); color: var(--colors-accent-lime); font-size: 13px;">// 06</span>
+                    </div>
+                    <h4 class="heading-sm mb-3 text-white">📊 Báo Cáo Đa Chiều</h4>
+                    <p class="body-md text-white-50" style="font-size: 14px;">
+                        Dashboard phân tích chuyên sâu cho ban giám hiệu và học viên. Thống kê kết quả học tập và số dư công nợ toàn hệ thống.
+                    </p>
                 </div>
             </div>
         </div>
