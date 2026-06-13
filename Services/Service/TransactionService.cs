@@ -1,4 +1,4 @@
-﻿using FapWeb.Models.Data;
+using FapWeb.Models.Data;
 using FapWeb.Models.Dtos.PaginatedDtos;
 using FapWeb.Models.Dtos.TransactionHistoryDtos;
 using FapWeb.Services.IServices;
@@ -44,7 +44,7 @@ namespace FapWeb.Services.Service
                                                                                     Id = x.Id,
                                                                                     TransactionType = x.PaymentMethod,
                                                                                     Amount = x.Amount,
-                                                                                    TransactionStatus = x.Status.StatusName,
+                                                                                    TransactionStatus = x.Status != null ? x.Status.StatusName : "SUCCESS",
                                                                                     CreatedAt = x.CreatedAt,
                                                                                     UpdatedAt = x.UpdatedAt
                                                                                 }).ToListAsync();
@@ -64,7 +64,7 @@ namespace FapWeb.Services.Service
                                                                                     Id = x.Id,
                                                                                     TransactionType = x.PaymentMethod,
                                                                                     Amount = x.Amount,
-                                                                                    TransactionStatus = x.Status.StatusName,
+                                                                                    TransactionStatus = x.Status != null ? x.Status.StatusName : "SUCCESS",
                                                                                     CreatedAt = x.CreatedAt,
                                                                                     UpdatedAt = x.UpdatedAt
                                                                                 }).ToListAsync();
@@ -96,7 +96,7 @@ namespace FapWeb.Services.Service
                     Id = x.Id,
                     TransactionType = x.PaymentMethod,
                     Amount = x.Amount,
-                    TransactionStatus = x.Status.StatusName,
+                    TransactionStatus = x.Status != null ? x.Status.StatusName : "SUCCESS",
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt
                 })

@@ -112,6 +112,7 @@ namespace FapWeb.Services.Service
             var tuitionStatusIds = await EnsureTuitionStatusesAsync();
             tuitionFee.StatusId = tuitionStatusIds[GetTuitionStatusName(tuitionFee.TotalAmount, tuitionFee.PaidAmount ?? 0).ToUpperInvariant()];
 
+            var transactionStatusIds = await EnsureTransactionStatusesAsync();
             await _context.Transactions.AddAsync(new Transaction
             {
                 TuitionFeeId = tuitionFee.Id,
@@ -120,6 +121,7 @@ namespace FapWeb.Services.Service
                 TransactionCode = string.IsNullOrWhiteSpace(request.Note)
                     ? $"PAY-{DateTime.UtcNow:yyyyMMddHHmmss}"
                     : request.Note.Trim(),
+                StatusId = transactionStatusIds[TransactionStatusSuccess],
                 PaidBy = receiverId,
                 CreatedAt = request.PaymentDate,
                 UpdatedAt = DateTime.UtcNow
@@ -158,6 +160,9 @@ namespace FapWeb.Services.Service
             {
                 query = query.Where(x => x.TuitionFeeId == tuitionFeeId.Value);
             }
+
+            // Only include successful online transactions or manual transactions
+            query = query.Where(x => x.StatusId == null || (x.Status != null && x.Status.StatusName == TransactionStatusSuccess));
 
             return await query
                 .OrderByDescending(x => x.CreatedAt)
