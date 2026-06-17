@@ -10,8 +10,6 @@ namespace FapWeb.Services.Service
 {
     public class UserManagementService : IUserManagementService
     {
-        private const string DefaultAdminPhone = "0900000000";
-        private const string DefaultAdminPassword = "Admin@123";
 
         private readonly PostgresContext _context;
 
@@ -247,35 +245,35 @@ namespace FapWeb.Services.Service
         /// Tạo tài khoản Admin mặc định khi hệ thống chưa có user nào,
         /// để tránh tình trạng không thể đăng nhập với database trống.
         /// </summary>
-        public async Task EnsureAdminAccountAsync()
-        {
-            if (await _context.Users.AnyAsync())
-            {
-                return;
-            }
+        //public async Task EnsureAdminAccountAsync()
+        //{
+        //    if (await _context.Users.AnyAsync())
+        //    {
+        //        return;
+        //    }
 
-            var adminRole = await _context.Roles.FirstOrDefaultAsync(x => x.RoleName == AppRoles.Admin);
-            if (adminRole == null)
-            {
-                adminRole = new Role { RoleName = AppRoles.Admin, Description = "Administrator" };
-                await _context.Roles.AddAsync(adminRole);
-                await _context.SaveChangesAsync();
-            }
+        //    var adminRole = await _context.Roles.FirstOrDefaultAsync(x => x.RoleName == AppRoles.Admin);
+        //    if (adminRole == null)
+        //    {
+        //        adminRole = new Role { RoleName = AppRoles.Admin, Description = "Administrator" };
+        //        await _context.Roles.AddAsync(adminRole);
+        //        await _context.SaveChangesAsync();
+        //    }
 
-            await _context.Users.AddAsync(new User
-            {
-                Id = Guid.NewGuid(),
-                FullName = "System Administrator",
-                Phone = DefaultAdminPhone,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(DefaultAdminPassword),
-                RoleId = adminRole.Id,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            });
+        //    await _context.Users.AddAsync(new User
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        FullName = "System Administrator",
+        //        Phone = DefaultAdminPhone,
+        //        PasswordHash = BCrypt.Net.BCrypt.HashPassword(DefaultAdminPassword),
+        //        RoleId = adminRole.Id,
+        //        IsActive = true,
+        //        CreatedAt = DateTime.UtcNow,
+        //        UpdatedAt = DateTime.UtcNow
+        //    });
 
-            await _context.SaveChangesAsync();
-        }
+        //    await _context.SaveChangesAsync();
+        //}
 
         private async Task<List<SelectListItem>> GetRoleOptionsAsync()
         {

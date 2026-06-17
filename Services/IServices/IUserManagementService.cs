@@ -22,6 +22,6 @@ namespace FapWeb.Services.IServices
 
         Task<bool> RemoveGuardianLinkAsync(Guid linkId);
 
-        Task EnsureAdminAccountAsync();
+        //Task EnsureAdminAccountAsync();
     }
 }

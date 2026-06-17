@@ -40,7 +40,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var userManagementService = scope.ServiceProvider.GetRequiredService<IUserManagementService>();
-    await userManagementService.EnsureAdminAccountAsync();
+    //await userManagementService.EnsureAdminAccountAsync();
 }
 
 // Configure the HTTP request pipeline.
