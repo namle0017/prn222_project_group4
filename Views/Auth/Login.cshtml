@@ -1,55 +1,793 @@
 @model FapWeb.Models.Dtos.LoginDtos.LoginRequestDto
 
 @{
-    ViewData["Title"] = "Đăng nhập";
+    Layout = null;
+    ViewData["Title"] = "Đăng nhập hệ thống";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card p-4 border border-secondary" style="border-radius: var(--rounded-xl) !important; background-color: var(--colors-surface-canvas-light) !important;">
-            <div class="card-body p-2">
-                <!-- Sentry Console Form Header -->
-                <div class="text-center mb-4">
-                    <span class="badge bg-success mb-2">SECURE_GATEWAY_v1.0</span>
-                    <h2 class="heading-md mb-2" style="font-family: var(--font-display); font-weight: 700; letter-spacing: -0.5px;">ĐĂNG NHẬP HỆ THỐNG</h2>
-                    <span class="small text-muted d-block">Vui lòng kết nối bằng số điện thoại đăng ký</span>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FAP Portal</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Icons & UI Library -->
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/site.css" />
+    
+    <style>
+        :root {
+            --primary-glow: #f27121; /* FPT Orange */
+            --secondary-glow: #833ab4; /* Electric Purple */
+            --bg-dark: #090613; /* Midnight Violet base */
+            --glass-bg: rgba(18, 13, 33, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-muted: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow Blobs */
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        .glow-1 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, rgba(242, 113, 33, 0) 70%);
+            top: -100px;
+            left: -100px;
+            animation: pulse-glow-1 15s infinite alternate ease-in-out;
+        }
+
+        .glow-2 {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, var(--secondary-glow) 0%, rgba(131, 58, 180, 0) 70%);
+            bottom: -150px;
+            right: -100px;
+            animation: pulse-glow-2 18s infinite alternate ease-in-out;
+        }
+
+        @@keyframes pulse-glow-1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(120px, 80px) scale(1.2); }
+        }
+
+        @@keyframes pulse-glow-2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-100px, -90px) scale(0.9); }
+        }
+
+        /* Particles / Grid Overlay */
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Glassmorphic Container */
+        .login-card {
+            width: 1000px;
+            max-width: 100%;
+            min-height: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Brand Panel (Left) */
+        .brand-panel {
+            flex: 1;
+            padding: 48px;
+            background: linear-gradient(135deg, rgba(242, 113, 33, 0.12) 0%, rgba(66, 32, 130, 0.25) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .brand-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo-glow {
+            filter: drop-shadow(0 0 12px rgba(242, 113, 33, 0.5));
+            animation: rotate-subtle 20s infinite linear;
+        }
+
+        @@keyframes rotate-subtle {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 26px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .system-status {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(194, 239, 78, 0.08);
+            border: 1px solid rgba(194, 239, 78, 0.2);
+            color: #c2ef4e;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            align-self: flex-start;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #c2ef4e;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @@keyframes pulse-dot {
+            0% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(0.9); }
+        }
+
+        .brand-mid-content {
+            margin: 40px 0;
+        }
+
+        .brand-headline {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 1.25;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 30%, #f27121 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-description {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .feature-icon-wrapper {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f27121;
+            font-size: 14px;
+        }
+
+        .brand-footer {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Form Panel (Right) */
+        .form-panel {
+            flex: 1.2;
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .form-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Custom Input Groups */
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 18px;
+            transition: color 0.3s ease;
+            z-index: 2;
+        }
+
+        .custom-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px 16px 50px;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .custom-input:focus {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: #f27121;
+            box-shadow: 0 0 0 4px rgba(242, 113, 33, 0.15);
+        }
+
+        .custom-input:focus ~ .input-icon {
+            color: #f27121;
+        }
+
+        .custom-label {
+            position: absolute;
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 15px;
+        }
+
+        /* Input field animations for floating labels */
+        .custom-input:focus ~ .custom-label,
+        .custom-input:not(:placeholder-shown) ~ .custom-label {
+            top: 0;
+            transform: translateY(-50%) scale(0.85);
+            left: 18px;
+            background: #110d21; /* Solid matching container base */
+            padding: 2px 8px;
+            color: #f27121;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Eye toggle for password */
+        .eye-toggle-btn {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            z-index: 3;
+            transition: color 0.3s ease;
+            padding: 4px;
+        }
+
+        .eye-toggle-btn:hover {
+            color: #ffffff;
+        }
+
+        /* Buttons and actions */
+        .btn-submit-premium {
+            background: linear-gradient(135deg, #f27121 0%, #e94e1b 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(242, 113, 33, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(242, 113, 33, 0.4);
+            background: linear-gradient(135deg, #ff843a 0%, #f27121 100%);
+        }
+
+        .btn-submit-premium:active {
+            transform: translateY(1px);
+        }
+
+        /* ASP.NET validation messages */
+        .validation-summary-errors {
+            background: rgba(239, 68, 68, 0.08) !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+            color: #fc8181 !important;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13.5px;
+            list-style: none;
+        }
+
+        .validation-summary-errors ul {
+            padding-left: 16px;
+            margin: 0;
+        }
+
+        .validation-summary-valid {
+            display: none !important;
+        }
+
+        .field-validation-error {
+            color: #fc8181;
+            font-size: 12.5px;
+            margin-top: 6px;
+            display: block;
+        }
+
+        /* Developer Quick Access Panel */
+        .quick-access-box {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 24px;
+        }
+
+        .btn-quick-toggle {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-quick-toggle:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border-color: rgba(242, 113, 33, 0.3);
+        }
+
+        .quick-access-body {
+            max-height: 350px;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .quick-access-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0 !important;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card:hover {
+            background: rgba(242, 113, 33, 0.05);
+            border-color: rgba(242, 113, 33, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .demo-role {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: inline-flex;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .demo-role.admin { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+        .demo-role.teacher { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+        .demo-role.student { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+        .demo-role.parent { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
+
+        .demo-phone {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .demo-pass {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-code);
+        }
+
+        .quick-note {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Toast notifications */
+        .quick-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(17, 13, 33, 0.95);
+            border: 1px solid rgba(242, 113, 33, 0.3);
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .quick-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        /* Mobile adjustments */
+        @@media (max-width: 900px) {
+            .login-card {
+                flex-direction: column;
+                max-width: 500px;
+                min-height: auto;
+            }
+
+            .brand-panel {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                padding: 32px 24px;
+            }
+
+            .brand-logo-section {
+                justify-content: center;
+            }
+
+            .brand-mid-content {
+                display: none; /* Hide features on small screens */
+            }
+
+            .brand-footer {
+                display: none;
+            }
+
+            .form-panel {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient glowing backgrounds -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="background-overlay"></div>
+
+    <!-- Main Card Container -->
+    <div class="login-card">
+        
+        <!-- Left Side: Brand Panel -->
+        <div class="brand-panel">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="brand-logo-section">
+                    <svg class="brand-logo-glow" width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#f27121" />
+                                <stop offset="100%" stop-color="#833ab4" />
+                            </linearGradient>
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="4" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+                        <path d="M32 8L56 22L32 36L8 22L32 8Z" fill="url(#logoGrad)" filter="url(#glow)" />
+                        <path d="M16 28V42C16 48 24 52 32 52C40 52 48 48 48 42V28L32 37L16 28Z" fill="url(#logoGrad)" opacity="0.85" />
+                    </svg>
+                    <span class="brand-name">FAP Portal</span>
                 </div>
+                <div class="system-status">
+                    <span class="status-dot"></span> Online
+                </div>
+            </div>
 
-                <form asp-action="Login" asp-controller="Auth" method="post" autocomplete="off">
-                    @Html.AntiForgeryToken()
-
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 mb-3" style="font-size: 14px;"></div>
-
-                    <!-- Phone Number Input -->
-                    <div class="mb-4">
-                        <label asp-for="UserPhoneNumber" class="eyebrow d-block mb-2 text-uppercase" style="font-size: 12px; font-weight: 600; color: var(--colors-accent-violet-mid);">
-                            [ PHONE_NUMBER ]
-                        </label>
-                        <input asp-for="UserPhoneNumber" class="form-control" placeholder="Nhập số điện thoại (e.g. 09xxxxxxxx)" />
-                        <span asp-validation-for="UserPhoneNumber" class="text-danger small mt-1 d-block"></span>
-                    </div>
-
-                    <!-- Password Input -->
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label asp-for="UserPassword" class="eyebrow text-uppercase" style="font-size: 12px; font-weight: 600; color: var(--colors-accent-violet-mid);">
-                                [ ACC_PASSWORD ]
-                            </label>
+            <div class="brand-mid-content">
+                <h1 class="brand-headline">Hệ thống quản lý học tập thế hệ mới</h1>
+                <p class="brand-description">Trải nghiệm cổng thông tin học thuật trực quan, nhanh chóng và an toàn dành cho sinh viên, giáo viên và phụ huynh FPT.</p>
+                
+                <ul class="features-list">
+                    <li class="feature-item">
+                        <div class="feature-icon-wrapper">
+                            <i class="fa-solid fa-calendar-days"></i>
                         </div>
-                        <input asp-for="UserPassword" type="password" class="form-control" placeholder="Nhập mật khẩu truy cập" />
-                        <span asp-validation-for="UserPassword" class="text-danger small mt-1 d-block"></span>
-                    </div>
+                        <span>Quản lý thời khóa biểu trực quan</span>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon-wrapper">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <span>Theo dõi chuyên cần & điểm danh thực tế</span>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon-wrapper">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <span>Cổng học phí thanh toán tự động SePay</span>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon-wrapper">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <span>Hệ thống thông báo tức thời</span>
+                    </li>
+                </ul>
+            </div>
 
-                    <!-- Primary Action Button -->
-                    <button type="submit" class="btn btn-primary w-100 py-3 mt-2" style="font-weight: 700;">
-                        KẾT NỐI HỆ THỐNG
-                    </button>
-                </form>
+            <div class="brand-footer">
+                <span>PRN222 Project - Group 4</span>
+                <span>v2.0.26</span>
             </div>
         </div>
-    </div>
-</div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+        <!-- Right Side: Form Panel -->
+        <div class="form-panel">
+            <div class="form-header">
+                <h2 class="form-title">Đăng Nhập</h2>
+                <p class="form-subtitle">Nhập số điện thoại đã đăng ký để kết nối vào hệ thống.</p>
+            </div>
+
+            <form asp-action="Login" asp-controller="Auth" method="post" autocomplete="off" id="loginForm">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+                <!-- Phone Input Group -->
+                <div class="input-group-custom">
+                    <i class="fa-solid fa-phone input-icon"></i>
+                    <input asp-for="UserPhoneNumber" class="custom-input" placeholder=" " id="UserPhoneNumber" required />
+                    <label asp-for="UserPhoneNumber" class="custom-label">Số điện thoại</label>
+                    <span asp-validation-for="UserPhoneNumber" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <!-- Password Input Group -->
+                <div class="input-group-custom">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input asp-for="UserPassword" type="password" class="custom-input" placeholder=" " id="UserPassword" required />
+                    <label asp-for="UserPassword" class="custom-label">Mật khẩu</label>
+                    <button type="button" class="eye-toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                    </button>
+                    <span asp-validation-for="UserPassword" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <!-- Actions Button -->
+                <div class="d-flex flex-column gap-3 mt-4">
+                    <button type="submit" class="btn-submit-premium w-100" id="submitBtn">
+                        KẾT NỐI HỆ THỐNG <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                    </button>
+                </div>
+            </form>
+
+
+        </div>
+
+    </div>
+
+    <!-- Quick Toast Notification -->
+    <div class="quick-toast" id="quickToast">
+        <div class="toast-content">
+            <i class="fa-solid fa-circle-check text-success fs-5"></i>
+            <span class="toast-text" id="toastMessage"></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // Password visibility toggle
+        function togglePassword() {
+            const passwordInput = document.getElementById('UserPassword');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Quick Access drawer toggle
+        function toggleQuickAccess() {
+            const body = document.getElementById('quickAccessBody');
+            const chevron = document.getElementById('quickChevron');
+            if (body.classList.contains('collapsed')) {
+                body.classList.remove('collapsed');
+                chevron.classList.remove('fa-chevron-down');
+                chevron.classList.add('fa-chevron-up');
+            } else {
+                body.classList.add('collapsed');
+                chevron.classList.remove('fa-chevron-up');
+                chevron.classList.add('fa-chevron-down');
+            }
+        }
+
+        // Autofill credentials
+        function fillCredentials(phone, password, role) {
+            const phoneInput = document.getElementById('UserPhoneNumber');
+            const passInput = document.getElementById('UserPassword');
+            
+            phoneInput.value = phone;
+            passInput.value = password;
+            
+            // Dispatch events to trigger CSS floating label state & validation
+            const event = new Event('input', { bubbles: true });
+            phoneInput.dispatchEvent(event);
+            passInput.dispatchEvent(event);
+
+            const changeEvent = new Event('change', { bubbles: true });
+            phoneInput.dispatchEvent(changeEvent);
+            passInput.dispatchEvent(changeEvent);
+            
+            // Show toast message
+            showToast(`Đã tự động điền tài khoản: ${role}`);
+        }
+
+        // Toast display function
+        function showToast(message) {
+            const toast = document.getElementById('quickToast');
+            const toastText = document.getElementById('toastMessage');
+            toastText.textContent = message;
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Form submit state handler
+        $(document).ready(function() {
+            const form = document.getElementById('loginForm');
+            const btn = document.getElementById('submitBtn');
+            
+            form.addEventListener('submit', function(e) {
+                if ($(form).valid()) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> ĐANG KẾT NỐI...';
+                    btn.style.opacity = '0.8';
+                }
+            });
+
+            // Ensure floating labels remain floating if inputs contain autofilled data (e.g. by browser)
+            const inputs = document.querySelectorAll('.custom-input');
+            inputs.forEach(input => {
+                // Initial check
+                if (input.value.trim() !== '') {
+                    input.placeholder = " "; // Force floating state
+                }
+                // Listener
+                input.addEventListener('change', () => {
+                    if (input.value.trim() !== '') {
+                        input.placeholder = " ";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
