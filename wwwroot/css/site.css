@@ -76,10 +76,21 @@
    ========================================= */
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Smooth theme transition for the entire page */
+body,
+body .card,
+body .navbar,
+body footer,
+body .dashboard-stat-card,
+body .card-feature-dark {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
 html {
   font-size: 15px;
   position: relative;
   min-height: 100%;
+
   scroll-behavior: smooth;
 }
 
@@ -1173,4 +1184,77 @@ body.canvas-light .eyebrow {
 /* Ensure color-lime-text works on light bg */
 body.canvas-light {
   --color-lime-text: #5a8a00;
+}
+
+/* =========================================
+   DARK MODE OVERRIDES FOR INNER PAGES
+   (activated when user toggles theme on light pages)
+   ========================================= */
+body.canvas-dark .dashboard-stat-card {
+  background: var(--color-bg-elevated) !important;
+  border-color: var(--color-border-subtle) !important;
+}
+
+body.canvas-dark .dsc-label {
+  color: rgba(240, 238, 255, 0.4) !important;
+}
+
+body.canvas-dark .dashboard-list-item {
+  border-bottom-color: rgba(139, 127, 218, 0.12) !important;
+}
+
+body.canvas-dark .dli-icon {
+  background: rgba(139, 127, 218, 0.1) !important;
+}
+
+body.canvas-dark .dli-label {
+  color: rgba(240, 238, 255, 0.65) !important;
+}
+
+body.canvas-dark .dli-value {
+  color: rgba(240, 238, 255, 0.85) !important;
+}
+
+body.canvas-dark h1,
+body.canvas-dark h2,
+body.canvas-dark h3,
+body.canvas-dark h4,
+body.canvas-dark h5,
+body.canvas-dark h6 {
+  color: var(--color-text-primary);
+}
+
+body.canvas-dark p {
+  color: var(--color-text-secondary);
+}
+
+body.canvas-dark .form-control,
+body.canvas-dark .form-select {
+  background-color: var(--color-bg-elevated) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border-subtle) !important;
+}
+
+body.canvas-dark .form-label {
+  color: var(--color-text-secondary) !important;
+}
+
+body.canvas-dark .list-group-item {
+  background-color: transparent !important;
+  color: var(--color-text-secondary) !important;
+  border-color: var(--color-border-subtle) !important;
+}
+
+/* Tech pill for dark mode */
+body.canvas-dark .tech-pill {
+  border-color: var(--color-border-subtle);
+  color: var(--color-text-secondary);
+}
+
+/* Page header text */
+body.canvas-dark .heading-xl,
+body.canvas-dark .heading-lg,
+body.canvas-dark .heading-md,
+body.canvas-dark .heading-sm {
+  color: var(--color-text-primary);
 }

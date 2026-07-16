@@ -19,14 +19,15 @@
     
     <!-- CSS Icons & UI Library -->
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="/css/site.css" />
     
     <style>
         :root {
-            --primary-glow: #f27121; /* FPT Orange */
-            --secondary-glow: #833ab4; /* Electric Purple */
-            --bg-dark: #090613; /* Midnight Violet base */
+            --primary-glow: #5b46c1;   /* Violet */
+            --secondary-glow: #b83ac8; /* Pink */
+            --accent-lime: #c8f04e;    /* Lime */
+            --bg-dark: #090613;        /* Midnight Violet base */
             --glass-bg: rgba(18, 13, 33, 0.65);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-muted: rgba(255, 255, 255, 0.5);
@@ -63,7 +64,7 @@
         .glow-1 {
             width: 450px;
             height: 450px;
-            background: radial-gradient(circle, var(--primary-glow) 0%, rgba(242, 113, 33, 0) 70%);
+            background: radial-gradient(circle, #6a3fda 0%, rgba(106, 63, 218, 0) 70%);
             top: -100px;
             left: -100px;
             animation: pulse-glow-1 15s infinite alternate ease-in-out;
@@ -72,7 +73,7 @@
         .glow-2 {
             width: 550px;
             height: 550px;
-            background: radial-gradient(circle, var(--secondary-glow) 0%, rgba(131, 58, 180, 0) 70%);
+            background: radial-gradient(circle, #b83ac8 0%, rgba(184, 58, 200, 0) 70%);
             bottom: -150px;
             right: -100px;
             animation: pulse-glow-2 18s infinite alternate ease-in-out;
@@ -121,7 +122,7 @@
         .brand-panel {
             flex: 1;
             padding: 48px;
-            background: linear-gradient(135deg, rgba(242, 113, 33, 0.12) 0%, rgba(66, 32, 130, 0.25) 100%);
+            background: linear-gradient(135deg, rgba(91, 70, 193, 0.18) 0%, rgba(200, 240, 78, 0.06) 100%);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
@@ -136,7 +137,7 @@
         }
 
         .brand-logo-glow {
-            filter: drop-shadow(0 0 12px rgba(242, 113, 33, 0.5));
+            filter: drop-shadow(0 0 12px rgba(91, 70, 193, 0.55));
             animation: rotate-subtle 20s infinite linear;
         }
 
@@ -195,7 +196,7 @@
             font-size: 32px;
             line-height: 1.25;
             margin-bottom: 16px;
-            background: linear-gradient(135deg, #ffffff 30%, #f27121 100%);
+            background: linear-gradient(135deg, #ffffff 30%, #c8f04e 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -233,7 +234,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #f27121;
+            color: #c8f04e;
             font-size: 14px;
         }
 
@@ -303,12 +304,12 @@
 
         .custom-input:focus {
             background: rgba(255, 255, 255, 0.06);
-            border-color: #f27121;
-            box-shadow: 0 0 0 4px rgba(242, 113, 33, 0.15);
+            border-color: #5b46c1;
+            box-shadow: 0 0 0 4px rgba(91, 70, 193, 0.18), 0 0 12px rgba(200, 240, 78, 0.08);
         }
 
         .custom-input:focus ~ .input-icon {
-            color: #f27121;
+            color: #5b46c1;
         }
 
         .custom-label {
@@ -330,7 +331,7 @@
             left: 18px;
             background: #110d21; /* Solid matching container base */
             padding: 2px 8px;
-            color: #f27121;
+            color: #5b46c1;
             border-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
@@ -356,7 +357,7 @@
 
         /* Buttons and actions */
         .btn-submit-premium {
-            background: linear-gradient(135deg, #f27121 0%, #e94e1b 100%);
+            background: linear-gradient(135deg, #5b46c1 0%, #7c3aed 100%);
             color: #ffffff;
             border: none;
             border-radius: 12px;
@@ -366,15 +367,15 @@
             letter-spacing: 0.5px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(242, 113, 33, 0.25);
+            box-shadow: 0 6px 20px rgba(91, 70, 193, 0.30);
             position: relative;
             overflow: hidden;
         }
 
         .btn-submit-premium:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(242, 113, 33, 0.4);
-            background: linear-gradient(135deg, #ff843a 0%, #f27121 100%);
+            box-shadow: 0 8px 28px rgba(91, 70, 193, 0.50);
+            background: linear-gradient(135deg, #7c5df7 0%, #5b46c1 100%);
         }
 
         .btn-submit-premium:active {
@@ -434,7 +435,7 @@
         .btn-quick-toggle:hover {
             background: rgba(255, 255, 255, 0.05);
             color: #ffffff;
-            border-color: rgba(242, 113, 33, 0.3);
+            border-color: rgba(91, 70, 193, 0.35);
         }
 
         .quick-access-body {
@@ -463,8 +464,8 @@
         }
 
         .demo-card:hover {
-            background: rgba(242, 113, 33, 0.05);
-            border-color: rgba(242, 113, 33, 0.3);
+            background: rgba(91, 70, 193, 0.07);
+            border-color: rgba(91, 70, 193, 0.35);
             transform: translateY(-1px);
         }
 
@@ -507,7 +508,7 @@
             bottom: 24px;
             right: 24px;
             background: rgba(17, 13, 33, 0.95);
-            border: 1px solid rgba(242, 113, 33, 0.3);
+            border: 1px solid rgba(91, 70, 193, 0.35);
             padding: 12px 24px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
@@ -581,8 +582,8 @@
                     <svg class="brand-logo-glow" width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#f27121" />
-                                <stop offset="100%" stop-color="#833ab4" />
+                                <stop offset="0%" stop-color="#5b46c1" />
+                                <stop offset="100%" stop-color="#c8f04e" />
                             </linearGradient>
                             <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
                                 <feGaussianBlur stdDeviation="4" result="blur" />
@@ -606,25 +607,25 @@
                 <ul class="features-list">
                     <li class="feature-item">
                         <div class="feature-icon-wrapper">
-                            <i class="fa-solid fa-calendar-days"></i>
+                            <i class="bi bi-calendar3"></i>
                         </div>
                         <span>Quản lý thời khóa biểu trực quan</span>
                     </li>
                     <li class="feature-item">
                         <div class="feature-icon-wrapper">
-                            <i class="fa-solid fa-user-check"></i>
+                            <i class="bi bi-person-check"></i>
                         </div>
-                        <span>Theo dõi chuyên cần & điểm danh thực tế</span>
+                        <span>Theo dõi chuyên cần &amp; điểm danh thực tế</span>
                     </li>
                     <li class="feature-item">
                         <div class="feature-icon-wrapper">
-                            <i class="fa-solid fa-credit-card"></i>
+                            <i class="bi bi-credit-card"></i>
                         </div>
                         <span>Cổng học phí thanh toán tự động SePay</span>
                     </li>
                     <li class="feature-item">
                         <div class="feature-icon-wrapper">
-                            <i class="fa-solid fa-bell"></i>
+                            <i class="bi bi-bell"></i>
                         </div>
                         <span>Hệ thống thông báo tức thời</span>
                     </li>
@@ -651,7 +652,7 @@
 
                 <!-- Phone Input Group -->
                 <div class="input-group-custom">
-                    <i class="fa-solid fa-phone input-icon"></i>
+                    <i class="bi bi-telephone input-icon"></i>
                     <input asp-for="UserPhoneNumber" class="custom-input" placeholder=" " id="UserPhoneNumber" required />
                     <label asp-for="UserPhoneNumber" class="custom-label">Số điện thoại</label>
                     <span asp-validation-for="UserPhoneNumber" class="text-danger small mt-1 d-block"></span>
@@ -659,11 +660,11 @@
 
                 <!-- Password Input Group -->
                 <div class="input-group-custom">
-                    <i class="fa-solid fa-lock input-icon"></i>
+                    <i class="bi bi-lock input-icon"></i>
                     <input asp-for="UserPassword" type="password" class="custom-input" placeholder=" " id="UserPassword" required />
                     <label asp-for="UserPassword" class="custom-label">Mật khẩu</label>
                     <button type="button" class="eye-toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility">
-                        <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                        <i class="bi bi-eye" id="togglePasswordIcon"></i>
                     </button>
                     <span asp-validation-for="UserPassword" class="text-danger small mt-1 d-block"></span>
                 </div>
@@ -671,7 +672,7 @@
                 <!-- Actions Button -->
                 <div class="d-flex flex-column gap-3 mt-4">
                     <button type="submit" class="btn-submit-premium w-100" id="submitBtn">
-                        KẾT NỐI HỆ THỐNG <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                        KẾT NỐI HỆ THỐNG <i class="bi bi-box-arrow-in-right ms-2"></i>
                     </button>
                 </div>
             </form>
@@ -684,7 +685,7 @@
     <!-- Quick Toast Notification -->
     <div class="quick-toast" id="quickToast">
         <div class="toast-content">
-            <i class="fa-solid fa-circle-check text-success fs-5"></i>
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
             <span class="toast-text" id="toastMessage"></span>
         </div>
     </div>
@@ -702,12 +703,12 @@
             const toggleIcon = document.getElementById('togglePasswordIcon');
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
             } else {
                 passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
             }
         }
 
@@ -717,12 +718,12 @@
             const chevron = document.getElementById('quickChevron');
             if (body.classList.contains('collapsed')) {
                 body.classList.remove('collapsed');
-                chevron.classList.remove('fa-chevron-down');
-                chevron.classList.add('fa-chevron-up');
+                chevron.classList.remove('bi-chevron-down');
+                chevron.classList.add('bi-chevron-up');
             } else {
                 body.classList.add('collapsed');
-                chevron.classList.remove('fa-chevron-up');
-                chevron.classList.add('fa-chevron-down');
+                chevron.classList.remove('bi-chevron-up');
+                chevron.classList.add('bi-chevron-down');
             }
         }
 
@@ -767,7 +768,7 @@
             form.addEventListener('submit', function(e) {
                 if ($(form).valid()) {
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> ĐANG KẾT NỐI...';
+                    btn.innerHTML = '<i class="bi bi-arrow-repeat me-2" style="animation:spin 1s linear infinite;display:inline-block"></i> ĐANG KẾT NỐI...';
                     btn.style.opacity = '0.8';
                 }
             });
@@ -788,6 +789,11 @@
             });
         });
     </script>
+    <style>
+        @@keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </body>
 </html>
-
