@@ -4,59 +4,99 @@
     ViewData["Title"] = "Student Dashboard";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">@ViewData["Title"]</h2>
+<div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+        <div class="eyebrow mb-1" style="color:#4fc3f7;">// STUDENT_PANEL</div>
+        <h1 class="heading-xl mb-0">Student Dashboard</h1>
+        <p class="body-md mt-1 mb-0" style="color:var(--color-text-light-muted);">Theo dõi học tập và lịch học của bạn</p>
+    </div>
+    <span class="badge bg-success" style="font-size:12px; padding:8px 14px;">
+        <i class="bi bi-person-check me-1"></i>ENROLLED
+    </span>
+</div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">My Classes</div><div class="fs-3 fw-semibold">@Model.MyClasses</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Absent Count</div><div class="fs-3 fw-semibold text-danger">@Model.AbsentCount</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Attendance Rate</div><div class="fs-3 fw-semibold">@Model.AttendanceRate%</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Tuition Remaining</div><div class="fs-5 fw-semibold text-danger">@Model.TuitionRemaining.ToString("N0") VND</div></div></div></div>
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent:#8b7fda; --accent-dim:rgba(139,127,218,0.1);">
+            <div class="dsc-icon">📚</div>
+            <div class="dsc-value">@Model.MyClasses</div>
+            <div class="dsc-label">My Classes</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent:#ff6eb0; --accent-dim:rgba(255,110,176,0.1);">
+            <div class="dsc-icon">❌</div>
+            <div class="dsc-value" style="color:#ff6eb0 !important;">@Model.AbsentCount</div>
+            <div class="dsc-label">Absent Count</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent:#c8f04e; --accent-dim:rgba(200,240,78,0.1);">
+            <div class="dsc-icon">📊</div>
+            <div class="dsc-value">@Model.AttendanceRate<span style="font-size:18px; font-weight:500;">%</span></div>
+            <div class="dsc-label">Attendance Rate</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent:#ffab40; --accent-dim:rgba(255,171,64,0.1);">
+            <div class="dsc-icon">💳</div>
+            <div class="dsc-value" style="font-size:20px; color:#ffab40 !important;">@Model.TuitionRemaining.ToString("N0")</div>
+            <div class="dsc-label">Remaining (VND)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <div style="width:8px; height:8px; border-radius:50%; background:#4fc3f7;"></div>
+                <h5 class="heading-sm mb-0">Upcoming Schedules</h5>
+            </div>
+            @if (!Model.UpcomingSchedules.Any())
+            {
+                <div class="alert alert-info mb-0"><i class="bi bi-calendar me-2"></i>No schedules yet.</div>
+            }
+            else
+            {
+                <ul class="list-unstyled mb-0">
+                    @foreach (var item in Model.UpcomingSchedules)
+                    {
+                        <li class="dashboard-list-item">
+                            <span class="dli-icon" style="color:#4fc3f7;"><i class="bi bi-calendar3"></i></span>
+                            <span class="dli-label">@item.ClassName</span>
+                            <span class="dli-value" style="font-size:12px; font-family:'JetBrains Mono',monospace;">@item.ScheduleDate.ToString("dd/MM") @item.StartTime</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body">
-                    <h5 class="card-title">Upcoming Schedules</h5>
-                    @if (!Model.UpcomingSchedules.Any())
-                    {
-                        <div class="alert alert-info mb-0">No schedules yet.</div>
-                    }
-                    else
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var item in Model.UpcomingSchedules)
-                            {
-                                <li class="list-group-item px-0">@item.ClassName - @item.ScheduleDate.ToString("dd/MM/yyyy") @item.StartTime - @item.EndTime</li>
-                            }
-                        </ul>
-                    }
-                </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <div style="width:8px; height:8px; border-radius:50%; background:#ff6eb0; animation:pulse-glow 2s infinite;"></div>
+                <h5 class="heading-sm mb-0">Latest Notifications</h5>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body">
-                    <h5 class="card-title">Latest Notifications</h5>
-                    @if (!Model.LatestNotifications.Any())
+            @if (!Model.LatestNotifications.Any())
+            {
+                <div class="alert alert-info mb-0"><i class="bi bi-bell-slash me-2"></i>No notifications yet.</div>
+            }
+            else
+            {
+                <ul class="list-unstyled mb-0">
+                    @foreach (var item in Model.LatestNotifications)
                     {
-                        <div class="alert alert-info mb-0">No notifications yet.</div>
+                        <li class="dashboard-list-item">
+                            <span class="dli-icon" style="color:#ff6eb0;"><i class="bi bi-bell"></i></span>
+                            <span class="dli-label">@item.Title</span>
+                            <span class="dli-value" style="font-size:11px; font-family:'JetBrains Mono',monospace;">@(item.CreatedAt?.ToString("dd/MM HH:mm") ?? "N/A")</span>
+                        </li>
                     }
-                    else
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var item in Model.LatestNotifications)
-                            {
-                                <li class="list-group-item px-0 d-flex justify-content-between">
-                                    <span>@item.Title</span>
-                                    <span class="text-muted small">@(item.CreatedAt?.ToString("dd/MM HH:mm") ?? "N/A")</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                </div>
-            </div>
+                </ul>
+            }
         </div>
     </div>
 </div>

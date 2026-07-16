@@ -4,57 +4,246 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">@ViewData["Title"]</h2>
-
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Students</div><div class="fs-3 fw-semibold">@Model.TotalStudents</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Teachers</div><div class="fs-3 fw-semibold">@Model.TotalTeachers</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Parents</div><div class="fs-3 fw-semibold">@Model.TotalParents</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Classes</div><div class="fs-3 fw-semibold">@Model.TotalClasses</div></div></div></div>
+<!-- Page Header -->
+<div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+        <div class="eyebrow mb-1" style="color:var(--color-violet);">// ADMIN_PANEL</div>
+        <h1 class="heading-xl mb-0" style="color:var(--color-text-dark);">Admin Dashboard</h1>
+        <p class="body-md mt-1 mb-0" style="color:var(--color-text-light-muted);">Tổng quan toàn bộ hệ thống FapWeb</p>
     </div>
-
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Expected Tuition</div><div class="fs-5 fw-semibold">@Model.TotalExpectedTuition.ToString("N0") VND</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Collected Tuition</div><div class="fs-5 fw-semibold text-success">@Model.TotalCollectedTuition.ToString("N0") VND</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Outstanding</div><div class="fs-5 fw-semibold text-danger">@Model.TotalOutstandingTuition.ToString("N0") VND</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Attendance Rate</div><div class="fs-3 fw-semibold">@Model.OverallAttendanceRate%</div></div></div></div>
+    <div class="badge-live" style="
+        background: rgba(91,70,193,0.1);
+        border-color: rgba(91,70,193,0.3);
+        color: var(--color-violet);
+    ">
+        LIVE DATA
     </div>
+</div>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body">
-                    <h5 class="card-title">System Snapshot</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item px-0">Active schedules: @Model.TotalActiveSchedules</li>
-                        <li class="list-group-item px-0">Students with unpaid tuition: @Model.StudentsWithUnpaidTuition</li>
-                    </ul>
-                </div>
-            </div>
+<!-- Primary Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #c8f04e; --accent-dim: rgba(200,240,78,0.12);">
+            <div class="dsc-icon">👨‍🎓</div>
+            <div class="dsc-value">@Model.TotalStudents</div>
+            <div class="dsc-label">Total Students</div>
         </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body">
-                    <h5 class="card-title">Latest Notifications</h5>
-                    @if (!Model.LatestNotifications.Any())
-                    {
-                        <div class="alert alert-info mb-0">No notifications yet.</div>
-                    }
-                    else
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var item in Model.LatestNotifications)
-                            {
-                                <li class="list-group-item px-0 d-flex justify-content-between">
-                                    <span>@item.Title</span>
-                                    <span class="text-muted small">@(item.CreatedAt?.ToString("dd/MM HH:mm") ?? "N/A")</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                </div>
-            </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #8b7fda; --accent-dim: rgba(139,127,218,0.12);">
+            <div class="dsc-icon">👩‍🏫</div>
+            <div class="dsc-value">@Model.TotalTeachers</div>
+            <div class="dsc-label">Teachers</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #ff6eb0; --accent-dim: rgba(255,110,176,0.12);">
+            <div class="dsc-icon">👨‍👩‍👦</div>
+            <div class="dsc-value">@Model.TotalParents</div>
+            <div class="dsc-label">Parents</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #4fc3f7; --accent-dim: rgba(79,195,247,0.12);">
+            <div class="dsc-icon">🏫</div>
+            <div class="dsc-value">@Model.TotalClasses</div>
+            <div class="dsc-label">Classes</div>
         </div>
     </div>
 </div>
+
+<!-- Finance & Attendance Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #c8f04e; --accent-dim: rgba(200,240,78,0.08);">
+            <div class="dsc-icon" style="font-size:16px;">💰</div>
+            <div class="dsc-value" style="font-size:20px;">@Model.TotalExpectedTuition.ToString("N0")</div>
+            <div class="dsc-label">Expected Tuition (VND)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #27c93f; --accent-dim: rgba(39,201,63,0.1);">
+            <div class="dsc-icon" style="font-size:16px;">✅</div>
+            <div class="dsc-value" style="font-size:20px; color:#27c93f !important;">@Model.TotalCollectedTuition.ToString("N0")</div>
+            <div class="dsc-label">Collected (VND)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #ff6eb0; --accent-dim: rgba(255,110,176,0.1);">
+            <div class="dsc-icon" style="font-size:16px;">⚠️</div>
+            <div class="dsc-value" style="font-size:20px; color:#ff6eb0 !important;">@Model.TotalOutstandingTuition.ToString("N0")</div>
+            <div class="dsc-label">Outstanding (VND)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="dashboard-stat-card" style="--accent: #ffab40; --accent-dim: rgba(255,171,64,0.1);">
+            <div class="dsc-icon" style="font-size:16px;">📊</div>
+            <div class="dsc-value" style="color:#ffab40 !important;">@Model.OverallAttendanceRate<span style="font-size:18px; font-weight:500;">%</span></div>
+            <div class="dsc-label">Attendance Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Cards -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <div style="width:8px; height:8px; border-radius:50%; background:var(--color-lime);"></div>
+                <h5 class="heading-sm mb-0">System Snapshot</h5>
+            </div>
+            <ul class="list-unstyled mb-0">
+                <li class="dashboard-list-item">
+                    <span class="dli-icon"><i class="bi bi-calendar-check"></i></span>
+                    <span class="dli-label">Active schedules</span>
+                    <span class="dli-value">@Model.TotalActiveSchedules</span>
+                </li>
+                <li class="dashboard-list-item">
+                    <span class="dli-icon" style="color:var(--color-pink);"><i class="bi bi-exclamation-circle"></i></span>
+                    <span class="dli-label">Students with unpaid tuition</span>
+                    <span class="dli-value" style="color:var(--color-pink);">@Model.StudentsWithUnpaidTuition</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <div style="width:8px; height:8px; border-radius:50%; background:var(--color-pink); animation: pulse-glow 2s infinite;"></div>
+                <h5 class="heading-sm mb-0">Latest Notifications</h5>
+            </div>
+            @if (!Model.LatestNotifications.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-bell-slash me-2"></i>No notifications yet.
+                </div>
+            }
+            else
+            {
+                <ul class="list-unstyled mb-0">
+                    @foreach (var item in Model.LatestNotifications)
+                    {
+                        <li class="dashboard-list-item">
+                            <span class="dli-icon" style="color:var(--color-violet);"><i class="bi bi-bell"></i></span>
+                            <span class="dli-label">@item.Title</span>
+                            <span class="dli-value" style="font-size:11px; font-family:'JetBrains Mono',monospace;">
+                                @(item.CreatedAt?.ToString("dd/MM HH:mm") ?? "N/A")
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+/* Dashboard Stat Card */
+.dashboard-stat-card {
+    background: var(--color-bg-light-surface);
+    border: 1px solid var(--color-border-cloud);
+    border-radius: 16px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+}
+
+.dashboard-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0.7;
+    border-radius: 16px 16px 0 0;
+}
+
+.dashboard-stat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.06);
+    border-color: rgba(0,0,0,0.1);
+}
+
+.dashboard-stat-card:hover::after { opacity: 1; }
+
+.dsc-icon {
+    font-size: 24px;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.dsc-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent);
+    position: relative;
+    z-index: 1;
+}
+
+.dsc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(60,55,80,0.5);
+    position: relative;
+    z-index: 1;
+}
+
+/* Dashboard List Item */
+.dashboard-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.dashboard-list-item:last-child { border-bottom: none; }
+
+.dli-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(91,70,193,0.08);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-violet, #6e5fa8);
+    flex-shrink: 0;
+}
+
+.dli-label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(26,21,48,0.75);
+}
+
+.dli-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: rgba(26,21,48,0.85);
+}
+</style>

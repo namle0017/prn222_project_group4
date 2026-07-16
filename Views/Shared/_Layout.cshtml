@@ -1,13 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="FapWeb - Hệ thống quản lý học tập và điểm danh thông minh, cảnh báo thời gian thực qua SignalR WebSocket." />
     <title>@ViewData["Title"] - FapWeb</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FapWeb.styles.css" asp-append-version="true" />
 </head>
@@ -21,7 +31,7 @@
 
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();
-    var isHomePage = string.Equals(controller, "Home", StringComparison.OrdinalIgnoreCase) && 
+    var isHomePage = string.Equals(controller, "Home", StringComparison.OrdinalIgnoreCase) &&
                      string.Equals(action, "Index", StringComparison.OrdinalIgnoreCase);
 
     var bodyClass = isHomePage ? "canvas-dark" : "canvas-light";
@@ -30,120 +40,268 @@
 }
 <body class="@bodyClass">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm @navbarClass">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FAPWEB</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg @navbarClass" id="main-navbar">
+            <div class="container">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+                    <div class="brand-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="28" height="28" rx="7" fill="url(#brand-grad)"/>
+                            <path d="M7 14L11 10L14 13L17 9L21 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="21" cy="14" r="2.5" fill="#c8f04e"/>
+                            <defs>
+                                <linearGradient id="brand-grad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#5b46c1"/>
+                                    <stop offset="1" stop-color="#8b7fda"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <span>FAPWEB</span>
+                </a>
+
+                <!-- Toggler -->
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                        aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <!-- Nav Links -->
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav flex-grow-1 ms-4 gap-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            <a class="nav-link d-flex align-items-center gap-1" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-grid-1x2" style="font-size:13px;"></i> Dashboard
+                            </a>
                         </li>
                         @if (isLoggedIn)
                         {
                             @if (isStaff)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="ClassManagement" asp-action="Index">Classes</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="ClassManagement" asp-action="Index">
+                                        <i class="bi bi-building" style="font-size:13px;"></i> Classes
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="ScheduleManagement" asp-action="Index">Schedule</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="ScheduleManagement" asp-action="Index">
+                                        <i class="bi bi-calendar3" style="font-size:13px;"></i> Schedule
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Attendance" asp-action="Index">Attendance</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Attendance" asp-action="Index">
+                                        <i class="bi bi-check2-square" style="font-size:13px;"></i> Attendance
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Tuition" asp-action="Index">Tuition</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Tuition" asp-action="Index">
+                                        <i class="bi bi-credit-card" style="font-size:13px;"></i> Tuition
+                                    </a>
                                 </li>
                             }
 
                             @if (isAdmin)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Transaction" asp-action="Index">Transactions</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Transaction" asp-action="Index">
+                                        <i class="bi bi-arrow-left-right" style="font-size:13px;"></i> Transactions
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="User" asp-action="Index">Users</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="User" asp-action="Index">
+                                        <i class="bi bi-people" style="font-size:13px;"></i> Users
+                                    </a>
                                 </li>
                             }
 
                             @if (canViewStudentAreas || isStaff)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Notification" asp-action="Index">Notifications</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Notification" asp-action="Index">
+                                        <i class="bi bi-bell" style="font-size:13px;"></i> Notifications
+                                    </a>
                                 </li>
                             }
 
                             @if (canViewStudentAreas)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Attendance" asp-action="History">Attendance History</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Attendance" asp-action="History">
+                                        <i class="bi bi-clock-history" style="font-size:13px;"></i> Attendance History
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Tuition" asp-action="History">Payment History</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Tuition" asp-action="History">
+                                        <i class="bi bi-receipt" style="font-size:13px;"></i> Payment History
+                                    </a>
                                 </li>
                             }
 
                             @if (!AppRoles.IsStaff(sessionRoleName))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Transaction" asp-action="MyHistory">My Transactions</a>
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-controller="Transaction" asp-action="MyHistory">
+                                        <i class="bi bi-wallet2" style="font-size:13px;"></i> My Transactions
+                                    </a>
                                 </li>
                             }
                         }
                     </ul>
-                    <div class="d-flex align-items-center gap-3">
+
+                    <!-- Auth Actions -->
+                    <div class="d-flex align-items-center gap-2 ms-auto">
                         @if (isLoggedIn)
                         {
-                            <span class="@(isHomePage ? "text-white-50" : "text-muted") small">
-                                Signed in as <strong>@sessionRoleName</strong>
-                            </span>
-                            <a class="btn btn-outline-secondary btn-sm" asp-controller="Auth" asp-action="ChangePassword">Change Password</a>
+                            <!-- Role pill -->
+                            <div class="role-pill">
+                                <i class="bi bi-person-circle"></i>
+                                <span>@sessionRoleName</span>
+                            </div>
+                            <a class="btn btn-sm btn-ghost-on-dark" style="padding:7px 14px; font-size:13px;" asp-controller="Auth" asp-action="ChangePassword">
+                                <i class="bi bi-key me-1"></i>Password
+                            </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post" class="mb-0">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+                                <button type="submit" class="btn btn-sm" style="padding:7px 14px; font-size:13px; background:rgba(255,110,176,0.12); color:#ff6eb0; border:1px solid rgba(255,110,176,0.3); border-radius:10px;">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </button>
                             </form>
                         }
                         else
                         {
-                            <a class="btn @btnThemeClass btn-sm" asp-controller="Auth" asp-action="Login">Login</a>
+                            <a class="btn btn-sm @btnThemeClass" style="padding:8px 20px; font-size:14px;" asp-controller="Auth" asp-action="Login">
+                                <i class="bi bi-lightning-charge-fill me-1"></i>Đăng nhập
+                            </a>
                         }
                     </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container py-4">
         <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
 
-    <!-- Sentry Signature: Lime Squiggly Footer Divider -->
+    <!-- Squiggly Divider -->
     <div class="container-fluid px-0">
-        <svg class="squiggly-divider" viewBox="0 0 1440 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 12C120 12 180 4 300 4C420 4 480 20 600 20C720 20 780 4 900 4C1020 4 1080 20 1200 20C1320 20 1380 12 1440 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <svg class="squiggly-divider" viewBox="0 0 1440 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 14C80 14 160 4 240 4C320 4 400 24 480 24C560 24 640 4 720 4C800 4 880 24 960 24C1040 24 1120 4 1200 4C1280 4 1360 14 1440 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    &copy; 2026 - FapWeb
+                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                    <a asp-controller="Home" asp-action="Index" class="d-inline-flex align-items-center gap-2 text-decoration-none" style="opacity:0.7;">
+                        <svg width="20" height="20" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="28" height="28" rx="7" fill="url(#footer-grad)"/>
+                            <path d="M7 14L11 10L14 13L17 9L21 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="21" cy="14" r="2.5" fill="#c8f04e"/>
+                            <defs>
+                                <linearGradient id="footer-grad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#5b46c1"/>
+                                    <stop offset="1" stop-color="#8b7fda"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;">FAPWEB</span>
+                    </a>
+                    <p class="mt-2 mb-0" style="font-size:12px; opacity:0.5;">&copy; 2026 FapWeb. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <span class="small @(isHomePage ? "text-white-50" : "text-muted")">Sentry-Inspired Debug Console Edition</span>
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="badge-live mx-auto" style="width:fit-content;">
+                        SYSTEM ONLINE
+                    </div>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; opacity:0.4;">
+                        SignalR · PostgreSQL · ASP.NET Core
+                    </span>
                 </div>
             </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Scroll reveal
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        reveals.forEach(el => observer.observe(el));
+
+        // Navbar scroll glass effect enhancement
+        const navbar = document.getElementById('main-navbar');
+        if (navbar) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
+                } else {
+                    navbar.style.boxShadow = '';
+                }
+            }, { passive: true });
+        }
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
+    <style>
+        .brand-icon {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .navbar-brand:hover .brand-icon {
+            transform: rotate(-8deg) scale(1.08);
+        }
+
+        .role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(139, 127, 218, 0.12);
+            border: 1px solid rgba(139, 127, 218, 0.28);
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8b7fda;
+            letter-spacing: 0.3px;
+        }
+
+        body.canvas-light .role-pill {
+            background: rgba(91, 70, 193, 0.08);
+            border-color: rgba(91, 70, 193, 0.2);
+            color: #5b46c1;
+        }
+
+        body.canvas-light .btn-ghost-on-dark {
+            background: rgba(0,0,0,0.05) !important;
+            color: #444 !important;
+            border: 1px solid rgba(0,0,0,0.12) !important;
+        }
+
+        body.canvas-light .btn-ghost-on-dark:hover {
+            background: rgba(0,0,0,0.08) !important;
+        }
+
+        body.canvas-light form button[type=submit] {
+            background: rgba(220, 50, 100, 0.08) !important;
+            color: #c0245e !important;
+            border-color: rgba(220, 50, 100, 0.25) !important;
+        }
+    </style>
 </body>
 </html>

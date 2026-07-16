@@ -1,191 +1,292 @@
 @{
-    ViewData["Title"] = "Trang chủ";
+    ViewData["Title"] = "Trang Chủ";
     var sessionUserId = Context.Session.GetString("UserId");
     var sessionRoleName = Context.Session.GetString("RoleName");
     var isLoggedIn = !string.IsNullOrWhiteSpace(sessionUserId);
 }
 
-<!-- Hero Area with Starfield Background -->
-<div class="starfield-hero position-relative py-5 px-4 px-md-5 mb-5 rounded-4 border border-secondary" style="border-color: var(--colors-hairline-violet) !important;">
-    
-    <!-- Floating Sticker Mascots -->
-    <div class="sticker-mascot d-none d-md-block" style="top: 15%; left: 3%; transform: rotate(-8deg);">
-        👨‍🚀 FAP_DEB_AGENT
+<!-- =============================================
+     HERO SECTION
+     ============================================= -->
+<section class="starfield-hero position-relative py-5 px-4 px-md-5 mb-5 rounded-4" style="border: 1px solid rgba(139,127,218,0.22);">
+
+    <!-- Layered background elements -->
+    <div class="star-canvas"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Floating sticker badges -->
+    <div class="sticker-mascot d-none d-md-block" style="top: 14%; left: 2%; transform: rotate(-7deg);">
+        <i class="bi bi-rocket-takeoff me-1"></i> FAP_AGENT_v2
     </div>
-    <div class="sticker-mascot lime-outline d-none d-lg-block" style="top: 10px; right: 28%; transform: rotate(4deg);">
-        ⚠️ WARNING: ATTENDANCE_ACTIVE
+    <div class="sticker-mascot lime-outline d-none d-lg-block" style="top: 8px; right: 26%; transform: rotate(4deg);">
+        <i class="bi bi-exclamation-triangle me-1"></i> ATTENDANCE_LIVE
     </div>
-    <div class="sticker-mascot d-none d-md-block" style="bottom: 12%; right: 4%; transform: rotate(6deg);">
-        👾 BUG_CRUSHER_v8.0
+    <div class="sticker-mascot d-none d-md-block" style="bottom: 10%; right: 3%; transform: rotate(5deg);">
+        <i class="bi bi-bug me-1"></i> BUG_CRUSHER_v8
     </div>
 
+    <!-- Main content -->
     <div class="row align-items-center position-relative py-5" style="z-index: 2;">
+
+        <!-- Left: Text content -->
         <div class="col-lg-7 text-center text-lg-start">
-            <div class="eyebrow text-uppercase mb-3" style="color: var(--colors-accent-pink); font-weight: 600;">
+            <!-- Live badge -->
+            <div class="d-flex justify-content-center justify-content-lg-start mb-4">
+                <div class="badge-live">SIGNALR REALTIME ACTIVE</div>
+            </div>
+
+            <!-- Eyebrow -->
+            <div class="eyebrow mb-3" style="color: rgba(200,240,78,0.8);">
                 // OBSERVABILITY FOR EDUCATION
             </div>
-            
-            <h1 class="display-hero mb-4 text-white">
-                HỆ THỐNG QUẢN LÝ <br/>
-                <span class="chip-lime-keyword">FAPWEB</span> PORTAL
+
+            <!-- Hero heading -->
+            <h1 class="display-hero mb-4 text-white" style="position:relative;">
+                HỆ THỐNG<br>
+                QUẢN LÝ&nbsp;<span class="chip-lime-keyword">FAPWEB</span><br>
+                <span style="font-size: 0.6em; font-weight: 400; color: rgba(200,240,78,0.75);">PORTAL</span>
             </h1>
-            
-            <p class="body-lg text-white-50 mb-5" style="max-width: 580px;">
-                Trang điều hành thông tin học tập và giao dịch chuyên sâu. Giám sát thời gian thực, tự động gửi cảnh báo điểm danh và nợ học phí qua WebSocket SignalR trực tiếp tới phụ huynh.
+
+            <!-- Description -->
+            <p class="body-lg mb-5" style="max-width: 540px; color: rgba(240,238,255,0.6);">
+                Trang điều hành học tập & tài chính chuyên sâu. Giám sát thời gian thực,
+                cảnh báo điểm danh và nợ học phí qua <span style="color:#c8f04e; font-weight:600;">SignalR WebSocket</span>.
             </p>
-            
-            <div class="d-flex gap-3 justify-content-center justify-content-lg-start align-items-center">
+
+            <!-- Stats row -->
+            <div class="d-flex gap-3 mb-5 justify-content-center justify-content-lg-start flex-wrap">
+                <div class="stat-chip">
+                    <span class="stat-chip__value">6</span>
+                    <span class="stat-chip__label">Modules</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-chip__value">12ms</span>
+                    <span class="stat-chip__label">Latency</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-chip__value">99%</span>
+                    <span class="stat-chip__label">Uptime</span>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="d-flex gap-3 justify-content-center justify-content-lg-start align-items-center flex-wrap">
                 @if (isLoggedIn)
                 {
-                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-inverted btn-lg px-4 py-3">
-                        Vào Dashboard <span class="ms-2">→</span>
+                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-inverted btn-lg px-5 py-3" id="hero-cta-dashboard">
+                        <i class="bi bi-grid-1x2 me-2"></i>Vào Dashboard <span class="ms-1">→</span>
                     </a>
                 }
                 else
                 {
-                    <a asp-controller="Auth" asp-action="Login" class="btn btn-inverted btn-lg px-4 py-3">
-                        Đăng Nhập Ngay
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-inverted btn-lg px-5 py-3" id="hero-cta-login">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Đăng Nhập Ngay
                     </a>
-                    <a href="#features" class="btn btn-ghost-on-dark btn-lg px-4 py-3">
-                        Khám Phá Tính Năng
+                    <a href="#features" class="btn btn-ghost-on-dark btn-lg px-4 py-3" id="hero-cta-features">
+                        <i class="bi bi-compass me-2"></i>Khám Phá
                     </a>
                 }
             </div>
         </div>
-        
-        <!-- Tilted Window-Chrome UI Mockup -->
+
+        <!-- Right: Terminal Chrome mockup -->
         <div class="col-lg-5 mt-5 mt-lg-0 d-flex justify-content-center">
-            <div class="window-chrome tilted-chrome w-100" style="max-width: 460px;">
+            <div class="window-chrome tilted-chrome w-100" style="max-width: 440px;">
                 <div class="window-chrome-header">
                     <div class="window-chrome-dot red"></div>
                     <div class="window-chrome-dot yellow"></div>
                     <div class="window-chrome-dot green"></div>
-                    <span class="ms-2 small text-white-50" style="font-family: var(--font-code); font-size: 11px;">console_output.log</span>
+                    <span class="ms-auto" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(240,238,255,0.35);">
+                        fapweb_console.log
+                    </span>
                 </div>
-                
-                <div class="code-block m-0 p-3" style="font-size: 13px; max-height: 250px; overflow-y: auto;">
-<span style="color: var(--colors-accent-pink);">[FapWeb System Initialization]</span>
-> Initializing Database Context... OK (PostgresSQL)
-> Connecting NotificationHub WebSocket... ACTIVE
-> Ready for role-based sessions.
+                <div class="code-block m-0 rounded-0 rounded-bottom" style="font-size:12.5px; max-height:260px; overflow-y:auto; border:none !important; border-top:1px solid rgba(139,127,218,0.18) !important;">
+<span style="color:rgba(240,238,255,0.4);"># system boot sequence</span>
+<span style="color:#c8f04e;">[✓]</span> Initializing DB Context       <span style="color:rgba(240,238,255,0.4);">OK</span>
+<span style="color:#c8f04e;">[✓]</span> Loading Session Middleware     <span style="color:rgba(240,238,255,0.4);">OK</span>
+<span style="color:#c8f04e;">[✓]</span> NotificationHub WebSocket      <span style="color:#c8f04e; font-weight:600;">ACTIVE</span>
+<span style="color:#c8f04e;">[✓]</span> Role-based Auth Guard          <span style="color:rgba(240,238,255,0.4);">OK</span>
 
-<span style="color: var(--colors-accent-lime);">[Live Feed - Class Schedule]</span>
-ID: SE1801-PRN222 | Attendance: 98%
-Status: <span class="badge bg-success py-1 px-2" style="font-size: 9px;">Checked-in</span>
+<span style="color:#8b7fda;">[LIVE]</span> Class Feed ─────────────────
+  SE1801-PRN222  Attendance: <span style="color:#c8f04e;">98.4%</span>
+  Status: <span class="badge bg-success py-1" style="font-size:9px; vertical-align:middle;">CHECKED-IN</span>
 
-<span style="color: var(--colors-accent-pink);">[SignalR Alerts Channel]</span>
-> Broadcast: Sent warning to Guardian (ID: 9912)
-> Message: "Student absent from SE1801 Session 3"
-> Delivery latency: 12ms.
+<span style="color:#ff6eb0;">[ALERT]</span> SignalR Push ────────────────
+  → Guardian #9912 notified
+  Msg: <span style="color:rgba(240,238,255,0.65);">"Student absent · Session 3"</span>
+  Latency: <span style="color:#c8f04e;">12ms</span>
+
+<span style="color:rgba(240,238,255,0.4);">&gt; Awaiting next event</span><span class="terminal-cursor"></span>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Features Section -->
-<div id="features" class="py-5">
-    <div class="text-center mb-5">
-        <div class="eyebrow text-uppercase mb-2" style="color: var(--colors-accent-lime);">[ MODULES_OVERVIEW ]</div>
-        <h2 class="display-large text-white">6 Phân Hệ Giám Sát Cốt Lõi</h2>
-        <p class="body-lg text-white-50" style="max-width: 600px; margin: 0 auto;">Cơ chế kiểm soát chặt chẽ, tối giản hóa thao tác vận hành.</p>
+<!-- =============================================
+     FEATURES SECTION
+     ============================================= -->
+<section id="features" class="py-5">
+
+    <!-- Section header -->
+    <div class="text-center mb-5 reveal">
+        <div class="eyebrow mb-3" style="color: rgba(200,240,78,0.75);">[ MODULES_OVERVIEW ]</div>
+        <h2 class="display-large text-white mb-3">6 Phân Hệ Giám Sát</h2>
+        <p class="body-lg" style="max-width: 580px; margin: 0 auto; color: rgba(240,238,255,0.55);">
+            Cơ chế kiểm soát chặt chẽ, tối giản hóa thao tác vận hành từng bộ phận.
+        </p>
     </div>
 
+    <!-- Feature Cards Grid -->
     <div class="row g-4">
-        <!-- 1. Authentication -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card-feature-dark d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-success">AUTH_TOKEN</span>
-                        <span style="font-family: var(--font-code); color: var(--colors-accent-pink); font-size: 13px;">// 01</span>
-                    </div>
-                    <h4 class="heading-sm mb-3 text-white">🔐 Xác Thực &amp; Phân Quyền</h4>
-                    <p class="body-md text-white-50" style="font-size: 14px;">
-                        Cơ chế lưu trữ Session an toàn, kiểm soát truy cập phân lớp cho Admin, Staff (Giáo viên), Phụ huynh và Học sinh.
-                    </p>
+
+        <!-- 01. Auth -->
+        <div class="col-md-6 col-lg-4 reveal reveal-d1">
+            <div class="card-feature-dark">
+                <div class="feature-icon feature-icon-lime mb-3">🔐</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-success">AUTH_TOKEN</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:rgba(200,240,78,0.6); font-size:11px;">// 01</span>
                 </div>
+                <h4 class="heading-sm mb-2 text-white">Xác Thực & Phân Quyền</h4>
+                <p class="body-md mb-0" style="color:rgba(240,238,255,0.55); font-size:14px;">
+                    Session security layer, kiểm soát truy cập phân lớp cho <span style="color:#c8f04e;">Admin</span>,
+                    <span style="color:#8b7fda;">Staff</span>, <span style="color:#ff6eb0;">Parent</span> & Student.
+                </p>
             </div>
         </div>
 
-        <!-- 2. Class Management -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card-feature-dark d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-warning">CLASS_MGMT</span>
-                        <span style="font-family: var(--font-code); color: var(--colors-accent-lime); font-size: 13px;">// 02</span>
-                    </div>
-                    <h4 class="heading-sm mb-3 text-white">🏫 Quản Lý Lớp Học</h4>
-                    <p class="body-md text-white-50" style="font-size: 14px;">
-                        Thiết lập sĩ số, điều phối danh sách học sinh và phân bổ giáo viên chủ nhiệm giảng dạy qua giao diện console tối giản.
-                    </p>
+        <!-- 02. Class Management -->
+        <div class="col-md-6 col-lg-4 reveal reveal-d2">
+            <div class="card-feature-dark">
+                <div class="feature-icon feature-icon-violet mb-3">🏫</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-warning">CLASS_MGMT</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:rgba(139,127,218,0.7); font-size:11px;">// 02</span>
                 </div>
+                <h4 class="heading-sm mb-2 text-white">Quản Lý Lớp Học</h4>
+                <p class="body-md mb-0" style="color:rgba(240,238,255,0.55); font-size:14px;">
+                    Thiết lập sĩ số, điều phối danh sách học sinh, phân bổ giáo viên chủ nhiệm qua giao diện tối giản.
+                </p>
             </div>
         </div>
 
-        <!-- 3. Tuition Management -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card-feature-dark d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-danger">FINANCE_LEDGER</span>
-                        <span style="font-family: var(--font-code); color: var(--colors-accent-pink); font-size: 13px;">// 03</span>
-                    </div>
-                    <h4 class="heading-sm mb-3 text-white">💳 Kiểm Soát Học Phí</h4>
-                    <p class="body-md text-white-50" style="font-size: 14px;">
-                        Theo dõi công nợ học kỳ tự động, cập nhật lịch sử hóa đơn tức thì, tính toán số dư chưa thanh toán với độ trễ tối thiểu.
-                    </p>
+        <!-- 03. Tuition -->
+        <div class="col-md-6 col-lg-4 reveal reveal-d3">
+            <div class="card-feature-dark">
+                <div class="feature-icon feature-icon-pink mb-3">💳</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-danger">FINANCE_LEDGER</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:rgba(255,110,176,0.65); font-size:11px;">// 03</span>
                 </div>
+                <h4 class="heading-sm mb-2 text-white">Kiểm Soát Học Phí</h4>
+                <p class="body-md mb-0" style="color:rgba(240,238,255,0.55); font-size:14px;">
+                    Theo dõi công nợ học kỳ, cập nhật lịch sử hóa đơn tức thì, tính số dư chưa thanh toán độ trễ tối thiểu.
+                </p>
             </div>
         </div>
 
-        <!-- 4. Attendance -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card-feature-dark d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-success">ATTENDANCE</span>
-                        <span style="font-family: var(--font-code); color: var(--colors-accent-lime); font-size: 13px;">// 04</span>
-                    </div>
-                    <h4 class="heading-sm mb-3 text-white">📝 Điểm Danh Chuyên Cần</h4>
-                    <p class="body-md text-white-50" style="font-size: 14px;">
-                        Giao diện ghi nhận chuyên cần nhanh theo nhóm lớp, thống kê tỉ lệ chuyên cần chính xác qua biểu đồ trực quan.
-                    </p>
+        <!-- 04. Attendance -->
+        <div class="col-md-6 col-lg-4 reveal reveal-d1">
+            <div class="card-feature-dark">
+                <div class="feature-icon feature-icon-lime mb-3">📝</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-success">ATTENDANCE</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:rgba(200,240,78,0.6); font-size:11px;">// 04</span>
                 </div>
+                <h4 class="heading-sm mb-2 text-white">Điểm Danh Chuyên Cần</h4>
+                <p class="body-md mb-0" style="color:rgba(240,238,255,0.55); font-size:14px;">
+                    Ghi nhận nhanh theo nhóm lớp, thống kê tỉ lệ chuyên cần chính xác qua biểu đồ trực quan real-time.
+                </p>
             </div>
         </div>
 
-        <!-- 5. Notifications -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card-feature-dark d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-warning">SIGNALR_PUSH</span>
-                        <span style="font-family: var(--font-code); color: var(--colors-accent-pink); font-size: 13px;">// 05</span>
-                    </div>
-                    <h4 class="heading-sm mb-3 text-white">🔔 Cảnh Báo WebSocket</h4>
-                    <p class="body-md text-white-50" style="font-size: 14px;">
-                        Thông báo tự động gửi về điện thoại phụ huynh qua SignalR Hub khi học sinh vắng học hoặc trễ kỳ hạn đóng học phí.
-                    </p>
+        <!-- 05. Notifications -->
+        <div class="col-md-6 col-lg-4 reveal reveal-d2">
+            <div class="card-feature-dark">
+                <div class="feature-icon feature-icon-violet mb-3">🔔</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-warning">SIGNALR_PUSH</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:rgba(139,127,218,0.7); font-size:11px;">// 05</span>
                 </div>
+                <h4 class="heading-sm mb-2 text-white">Cảnh Báo WebSocket</h4>
+                <p class="body-md mb-0" style="color:rgba(240,238,255,0.55); font-size:14px;">
+                    Thông báo tự động qua <span style="color:#8b7fda;">SignalR Hub</span> khi học sinh vắng học hoặc trễ hạn đóng học phí.
+                </p>
             </div>
         </div>
 
-        <!-- 6. Dashboard -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card-feature-dark d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-danger">METRICS_SYS</span>
-                        <span style="font-family: var(--font-code); color: var(--colors-accent-lime); font-size: 13px;">// 06</span>
-                    </div>
-                    <h4 class="heading-sm mb-3 text-white">📊 Báo Cáo Đa Chiều</h4>
-                    <p class="body-md text-white-50" style="font-size: 14px;">
-                        Dashboard phân tích chuyên sâu cho ban giám hiệu và học viên. Thống kê kết quả học tập và số dư công nợ toàn hệ thống.
-                    </p>
+        <!-- 06. Dashboard -->
+        <div class="col-md-6 col-lg-4 reveal reveal-d3">
+            <div class="card-feature-dark">
+                <div class="feature-icon feature-icon-pink mb-3">📊</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-danger">METRICS_SYS</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:rgba(255,110,176,0.65); font-size:11px;">// 06</span>
                 </div>
+                <h4 class="heading-sm mb-2 text-white">Báo Cáo Đa Chiều</h4>
+                <p class="body-md mb-0" style="color:rgba(240,238,255,0.55); font-size:14px;">
+                    Dashboard phân tích cho ban giám hiệu & học viên — thống kê học tập, công nợ toàn hệ thống.
+                </p>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- =============================================
+     TECH STACK SECTION
+     ============================================= -->
+<section class="py-5 mt-3">
+    <div class="gradient-divider mb-5"></div>
+
+    <div class="text-center reveal">
+        <div class="eyebrow mb-4" style="color:rgba(240,238,255,0.35);">[ BUILT WITH ]</div>
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
+            @foreach (var tech in new[] {
+                ("bi-server", "ASP.NET Core", "#c8f04e"),
+                ("bi-database", "PostgreSQL", "#4fc3f7"),
+                ("bi-broadcast", "SignalR", "#ff6eb0"),
+                ("bi-bootstrap", "Bootstrap 5", "#8b7fda"),
+                ("bi-shield-lock", "Session Auth", "#ffab40"),
+                ("bi-graph-up", "Real-time Metrics", "#c8f04e")
+            })
+            {
+                <div class="tech-pill">
+                    <i class="bi @tech.Item1" style="color:@tech.Item3;"></i>
+                    <span>@tech.Item2</span>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+/* Home-page specific styles */
+.tech-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(139,127,218,0.18);
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(240,238,255,0.65);
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    cursor: default;
+}
+
+.tech-pill:hover {
+    background: rgba(139,127,218,0.1);
+    border-color: rgba(139,127,218,0.35);
+    color: rgba(240,238,255,0.9);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.tech-pill i { font-size: 15px; }
+
+/* Smooth scroll offset for anchor */
+#features { scroll-margin-top: 90px; }
+</style>
