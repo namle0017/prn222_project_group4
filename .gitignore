@@ -428,3 +428,6 @@ efpt.config.json
 .env
 
 *.md
+
+# Version-controlled technical documentation
+!docs/CHATBOT.md
