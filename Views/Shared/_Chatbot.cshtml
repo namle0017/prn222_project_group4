@@ -1,0 +1,62 @@
+@using FapWeb.Infrastructure
+@{
+    var roleName = Context.Session.GetString(AppSessionKeys.RoleName);
+    var suggestedQuestions = AppRoles.IsTeacher(roleName)
+        ? new[] { "Lịch dạy sắp tới của tôi", "Tình hình điểm danh gần đây", "Học phí của lớp tôi" }
+        : AppRoles.IsParent(roleName)
+            ? new[] { "Lịch học sắp tới của con", "Điểm danh gần đây", "Học phí còn lại" }
+            : AppRoles.IsStudent(roleName)
+                ? new[] { "Lịch học sắp tới", "Điểm danh của tôi", "Học phí của tôi" }
+                : new[] { "Hướng dẫn quản lý lớp", "Hướng dẫn điểm danh", "Hướng dẫn quản lý học phí" };
+}
+
+<div id="fap-chatbot" class="fap-chatbot">
+    <button id="fap-chatbot-launcher" class="fap-chatbot__launcher" type="button"
+            aria-label="Mở trợ lý FapWeb" aria-controls="fap-chatbot-panel" aria-expanded="false">
+        <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+        <span class="fap-chatbot__launcher-ping" aria-hidden="true"></span>
+    </button>
+
+    <section id="fap-chatbot-panel" class="fap-chatbot__panel" role="dialog" aria-modal="false"
+             aria-labelledby="fap-chatbot-title" hidden>
+        <header class="fap-chatbot__header">
+            <div class="fap-chatbot__brand">
+                <span class="fap-chatbot__brand-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
+                <div>
+                    <h2 id="fap-chatbot-title">Trợ lý FapWeb</h2>
+                    <p><span class="fap-chatbot__status-dot"></span> Hỗ trợ tra cứu thông tin</p>
+                </div>
+            </div>
+            <button id="fap-chatbot-close" class="fap-chatbot__close" type="button" aria-label="Đóng trợ lý">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+        </header>
+
+        <div id="fap-chatbot-messages" class="fap-chatbot__messages" role="log" aria-live="polite" aria-relevant="additions">
+            <div class="fap-chatbot__message fap-chatbot__message--assistant">
+                <span class="fap-chatbot__avatar"><i class="bi bi-stars" aria-hidden="true"></i></span>
+                <div>
+                    <p>Xin chào! Tôi có thể hỗ trợ tra cứu lịch học, điểm danh, học phí và thông báo của bạn.</p>
+                    <p class="fap-chatbot__privacy"><i class="bi bi-shield-check" aria-hidden="true"></i> Dữ liệu cần thiết cho câu hỏi sẽ được gửi đến MiMo để tạo câu trả lời. Không gửi mật khẩu, email hoặc số điện thoại.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="fap-chatbot__suggestions" aria-label="Câu hỏi gợi ý">
+            @foreach (var question in suggestedQuestions)
+            {
+                <button type="button" class="fap-chatbot__suggestion" data-chat-question="@question">@question</button>
+            }
+        </div>
+
+        <form id="fap-chatbot-form" class="fap-chatbot__form" asp-controller="Chat" asp-action="Ask" method="post">
+            @Html.AntiForgeryToken()
+            <label class="visually-hidden" for="fap-chatbot-input">Nhập câu hỏi cho trợ lý FapWeb</label>
+            <textarea id="fap-chatbot-input" name="Message" maxlength="500" rows="1"
+                      placeholder="Nhập câu hỏi của bạn..." autocomplete="off"></textarea>
+            <button id="fap-chatbot-send" type="submit" aria-label="Gửi câu hỏi" title="Gửi câu hỏi">
+                <i class="bi bi-send-fill" aria-hidden="true"></i>
+            </button>
+        </form>
+    </section>
+</div>

@@ -19,6 +19,7 @@
 
     <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chatbot.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FapWeb.styles.css" asp-append-version="true" />
 </head>
 @{
@@ -47,7 +48,7 @@
     </div>
 
     <header>
-        <nav class="navbar navbar-expand-lg @navbarClass" id="main-navbar">
+        <nav class="navbar navbar-expand-xxl @navbarClass" id="main-navbar">
             <div class="container">
                 <!-- Brand -->
                 <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
@@ -78,7 +79,7 @@
                     <ul class="navbar-nav flex-grow-1 ms-4 gap-1">
                         <li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-1" asp-area="" asp-controller="Dashboard" asp-action="Index">
-                                <i class="bi bi-grid-1x2" style="font-size:13px;"></i> Dashboard
+                                <i class="bi bi-grid-1x2" style="font-size:13px;"></i> Tổng quan
                             </a>
                         </li>
                         @if (isLoggedIn)
@@ -87,22 +88,22 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="ClassManagement" asp-action="Index">
-                                        <i class="bi bi-building" style="font-size:13px;"></i> Classes
+                                        <i class="bi bi-building" style="font-size:13px;"></i> Lớp học
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="ScheduleManagement" asp-action="Index">
-                                        <i class="bi bi-calendar3" style="font-size:13px;"></i> Schedule
+                                        <i class="bi bi-calendar3" style="font-size:13px;"></i> Lịch học
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Attendance" asp-action="Index">
-                                        <i class="bi bi-check2-square" style="font-size:13px;"></i> Attendance
+                                        <i class="bi bi-check2-square" style="font-size:13px;"></i> Điểm danh
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Tuition" asp-action="Index">
-                                        <i class="bi bi-credit-card" style="font-size:13px;"></i> Tuition
+                                        <i class="bi bi-credit-card" style="font-size:13px;"></i> Học phí
                                     </a>
                                 </li>
                             }
@@ -111,12 +112,12 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Transaction" asp-action="Index">
-                                        <i class="bi bi-arrow-left-right" style="font-size:13px;"></i> Transactions
+                                        <i class="bi bi-arrow-left-right" style="font-size:13px;"></i> Giao dịch
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="User" asp-action="Index">
-                                        <i class="bi bi-people" style="font-size:13px;"></i> Users
+                                        <i class="bi bi-people" style="font-size:13px;"></i> Tài khoản
                                     </a>
                                 </li>
                             }
@@ -125,7 +126,7 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Notification" asp-action="Index">
-                                        <i class="bi bi-bell" style="font-size:13px;"></i> Notifications
+                                        <i class="bi bi-bell" style="font-size:13px;"></i> Thông báo
                                     </a>
                                 </li>
                             }
@@ -134,12 +135,12 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Attendance" asp-action="History">
-                                        <i class="bi bi-clock-history" style="font-size:13px;"></i> Attendance History
+                                        <i class="bi bi-clock-history" style="font-size:13px;"></i> Lịch sử điểm danh
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Tuition" asp-action="History">
-                                        <i class="bi bi-receipt" style="font-size:13px;"></i> Payment History
+                                        <i class="bi bi-receipt" style="font-size:13px;"></i> Lịch sử thanh toán
                                     </a>
                                 </li>
                             }
@@ -148,7 +149,7 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link d-flex align-items-center gap-1" asp-controller="Transaction" asp-action="MyHistory">
-                                        <i class="bi bi-wallet2" style="font-size:13px;"></i> My Transactions
+                                        <i class="bi bi-wallet2" style="font-size:13px;"></i> Giao dịch của tôi
                                     </a>
                                 </li>
                             }
@@ -156,7 +157,7 @@
                     </ul>
 
                     <!-- Auth Actions -->
-                    <div class="d-flex align-items-center gap-2 ms-auto">
+                    <div class="navbar-actions d-flex align-items-center gap-2 ms-auto">
                         @if (isLoggedIn)
                         {
                             <!-- Role pill -->
@@ -165,12 +166,12 @@
                                 <span>@sessionRoleName</span>
                             </div>
                             <a class="btn btn-sm btn-ghost-on-dark" style="padding:7px 14px; font-size:13px;" asp-controller="Auth" asp-action="ChangePassword">
-                                <i class="bi bi-key me-1"></i>Password
+                                <i class="bi bi-key me-1"></i>Đổi mật khẩu
                             </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post" class="mb-0">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm" style="padding:7px 14px; font-size:13px; background:rgba(255,110,176,0.12); color:#ff6eb0; border:1px solid rgba(255,110,176,0.3); border-radius:10px;">
-                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                    <i class="bi bi-box-arrow-right me-1"></i>Đăng xuất
                                 </button>
                             </form>
                         }
@@ -249,9 +250,18 @@
     <!-- 🔔 Global Toast Container -->
     <div id="fap-toast-container" aria-live="polite" aria-atomic="false"></div>
 
+    @if (isLoggedIn)
+    {
+        <partial name="_Chatbot" />
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (isLoggedIn)
+    {
+        <script src="~/js/chatbot.js" asp-append-version="true"></script>
+    }
 
     <script>
         // ── Scroll Reveal ────────────────────────────────────
