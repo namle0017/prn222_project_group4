@@ -1258,3 +1258,126 @@ body.canvas-dark .heading-md,
 body.canvas-dark .heading-sm {
   color: var(--color-text-primary);
 }
+/* =========================================
+   LIGHT-FORM ACCESSIBILITY & PASSWORD PAGE
+   ========================================= */
+body.canvas-light .form-label {
+  color: #4b4560 !important;
+}
+
+body.canvas-light .form-control::placeholder {
+  color: #7b7488 !important;
+}
+
+.auth-password-page {
+  min-height: calc(100vh - 270px);
+  padding: 24px 0 56px;
+}
+
+.auth-password-page > .row {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.auth-password-card {
+  width: 100%;
+}
+
+.auth-password-card {
+  padding: 0 !important;
+  border-color: rgba(91, 70, 193, 0.16) !important;
+  box-shadow: 0 16px 42px rgba(33, 21, 68, 0.12) !important;
+}
+
+.auth-password-card:hover {
+  transform: none !important;
+  border-color: rgba(91, 70, 193, 0.16) !important;
+  box-shadow: 0 16px 42px rgba(33, 21, 68, 0.12) !important;
+}
+
+.auth-password-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #5b46c1, #8b7fda);
+  box-shadow: 0 8px 18px rgba(91, 70, 193, 0.24);
+  font-size: 20px;
+}
+
+.auth-password-card h1 { color: #211a37; font-family: var(--font-display); font-weight: 700; }
+.auth-password-card__intro { color: #6a6478; font-size: 14px; }
+
+.password-input { position: relative; }
+.password-input .form-control { padding-right: 48px !important; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  color: #625a77;
+  background: transparent;
+  transform: translateY(-50%);
+}
+.password-toggle:hover, .password-toggle:focus-visible { color: #5b46c1; background: rgba(91, 70, 193, 0.09); outline: 2px solid rgba(91, 70, 193, 0.26); }
+.password-help, .password-match { margin: 7px 0 0; color: #726b80; font-size: 12px; }
+.password-match.is-valid { color: #198754; }.password-match.is-invalid { color: #c0265d; }
+.password-strength { display: flex; align-items: center; gap: 9px; margin-top: 8px; color: #625a77; font-size: 12px; }
+.password-strength__bar { width: 82px; height: 5px; overflow: hidden; border-radius: 99px; background: #e9e6f0; }
+.password-strength__bar span { display: block; width: 0; height: 100%; border-radius: inherit; background: #c0265d; transition: width .2s ease, background .2s ease; }
+.password-strength[data-level="3"] .password-strength__bar span { background: #d58d21; }.password-strength[data-level="4"] .password-strength__bar span { background: #5b46c1; }.password-strength[data-level="5"] .password-strength__bar span { background: #198754; }
+.auth-submit { min-height: 48px; color: #fff !important; background: linear-gradient(135deg, #6a459f, #9a3f78) !important; border: 0 !important; box-shadow: 0 8px 20px rgba(106, 69, 159, .28) !important; }
+.auth-submit:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(106, 69, 159, .36) !important; }
+
+@media (max-width: 575.98px) {
+  .auth-password-page { min-height: auto; padding-top: 8px; }
+  .auth-password-card .card-body { padding: 28px 22px !important; }
+}
+
+/* Keep the desktop navigation on one line.  Below this width Bootstrap shows
+   the compact menu instead of squeezing labels and buttons into two lines. */
+@media (min-width: 1400px) {
+  #main-navbar > .container {
+    max-width: 1500px;
+  }
+
+  #main-navbar .navbar-brand,
+  #main-navbar .navbar-nav,
+  #main-navbar .nav-item,
+  #main-navbar .nav-link,
+  #main-navbar .navbar-actions,
+  #main-navbar .role-pill,
+  #main-navbar .navbar-actions .btn,
+  #main-navbar .navbar-actions button {
+    white-space: nowrap;
+  }
+
+  #main-navbar .navbar-brand,
+  #main-navbar .nav-item,
+  #main-navbar .navbar-actions,
+  #main-navbar .role-pill {
+    flex-shrink: 0;
+  }
+
+  #main-navbar .navbar-nav {
+    flex-wrap: nowrap;
+  }
+
+  #main-navbar .nav-link {
+    margin-right: 0;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  #main-navbar .navbar-actions .btn {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
