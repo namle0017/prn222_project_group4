@@ -12,6 +12,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@ViewData["Title"]</h2>
         <div class="d-flex gap-2">
+            <a asp-controller="Tuition" asp-action="ExportTuition" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Xuất Excel</a>
             <a asp-controller="Tuition" asp-action="CreateFee" class="btn btn-primary">+ Tạo khoản thu</a>
             <a asp-controller="Tuition" asp-action="History" class="btn btn-outline-secondary">Lịch sử thanh toán</a>
         </div>
