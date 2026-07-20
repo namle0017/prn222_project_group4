@@ -11,7 +11,7 @@
         <p class="body-md mt-1 mb-0" style="color:var(--color-text-light-muted);">Theo dõi học tập và lịch học của bạn</p>
     </div>
     <span class="badge bg-success" style="font-size:12px; padding:8px 14px;">
-        <i class="bi bi-person-check me-1"></i>ENROLLED
+        <i class="bi bi-person-check me-1"></i>ĐANG HỌC
     </span>
 </div>
 
@@ -21,28 +21,28 @@
         <div class="dashboard-stat-card" style="--accent:#8b7fda; --accent-dim:rgba(139,127,218,0.1);">
             <div class="dsc-icon">📚</div>
             <div class="dsc-value">@Model.MyClasses</div>
-            <div class="dsc-label">My Classes</div>
+            <div class="dsc-label">Lớp của tôi</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="dashboard-stat-card" style="--accent:#ff6eb0; --accent-dim:rgba(255,110,176,0.1);">
             <div class="dsc-icon">❌</div>
             <div class="dsc-value" style="color:#ff6eb0 !important;">@Model.AbsentCount</div>
-            <div class="dsc-label">Absent Count</div>
+            <div class="dsc-label">Số buổi vắng</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="dashboard-stat-card" style="--accent:#c8f04e; --accent-dim:rgba(200,240,78,0.1);">
             <div class="dsc-icon">📊</div>
             <div class="dsc-value">@Model.AttendanceRate<span style="font-size:18px; font-weight:500;">%</span></div>
-            <div class="dsc-label">Attendance Rate</div>
+            <div class="dsc-label">Tỉ lệ đi học</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="dashboard-stat-card" style="--accent:#ffab40; --accent-dim:rgba(255,171,64,0.1);">
             <div class="dsc-icon">💳</div>
             <div class="dsc-value" style="font-size:20px; color:#ffab40 !important;">@Model.TuitionRemaining.ToString("N0")</div>
-            <div class="dsc-label">Remaining (VND)</div>
+            <div class="dsc-label">Còn nợ (VND)</div>
         </div>
     </div>
 </div>
@@ -52,11 +52,11 @@
         <div class="card h-100">
             <div class="d-flex align-items-center gap-2 mb-4">
                 <div style="width:8px; height:8px; border-radius:50%; background:#4fc3f7;"></div>
-                <h5 class="heading-sm mb-0">Upcoming Schedules</h5>
+                <h5 class="heading-sm mb-0">Lịch học sắp tới</h5>
             </div>
             @if (!Model.UpcomingSchedules.Any())
             {
-                <div class="alert alert-info mb-0"><i class="bi bi-calendar me-2"></i>No schedules yet.</div>
+                <div class="alert alert-info mb-0"><i class="bi bi-calendar me-2"></i>Chưa có lịch học.</div>
             }
             else
             {
@@ -78,11 +78,11 @@
         <div class="card h-100">
             <div class="d-flex align-items-center gap-2 mb-4">
                 <div style="width:8px; height:8px; border-radius:50%; background:#ff6eb0; animation:pulse-glow 2s infinite;"></div>
-                <h5 class="heading-sm mb-0">Latest Notifications</h5>
+                <h5 class="heading-sm mb-0">Thông báo mới nhất</h5>
             </div>
             @if (!Model.LatestNotifications.Any())
             {
-                <div class="alert alert-info mb-0"><i class="bi bi-bell-slash me-2"></i>No notifications yet.</div>
+                <div class="alert alert-info mb-0"><i class="bi bi-bell-slash me-2"></i>Chưa có thông báo.</div>
             }
             else
             {
