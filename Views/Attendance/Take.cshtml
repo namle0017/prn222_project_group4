@@ -156,8 +156,13 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Lưu điểm danh</button>
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Lưu điểm danh</button>
+                        <a asp-action="ExportSession" asp-route-classId="@Model.ClassId" asp-route-scheduleId="@Model.ScheduleId" asp-route-attendanceDate="@Model.AttendanceDate.ToString("yyyy-MM-dd")" class="btn btn-success">
+                            <i class="bi bi-file-earmark-excel"></i> Xuất kết quả ra Excel
+                        </a>
+                    </div>
                 </form>
             }
         </div>

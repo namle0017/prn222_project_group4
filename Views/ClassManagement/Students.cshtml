@@ -8,6 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@Model.ClassName - Học sinh</h2>
         <div class="d-flex gap-2">
+            <a asp-action="ExportStudents" asp-route-id="@Model.ClassId" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Xuất Excel</a>
             <a asp-action="AddStudent" asp-route-classId="@Model.ClassId" class="btn btn-primary">Thêm học sinh</a>
             <a asp-action="Details" asp-route-id="@Model.ClassId" class="btn btn-outline-secondary">Trở về</a>
         </div>

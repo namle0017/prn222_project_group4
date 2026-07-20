@@ -83,6 +83,58 @@ namespace FapWeb.Controllers
             return View(history);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ExportHistory(Guid? studentId)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var history = await _attendanceService.GetAttendanceHistoryAsync(userId.Value, GetCurrentRoleName(), studentId);
+            
+            var builder = new System.Text.StringBuilder();
+            builder.AppendLine("Ngày,Học sinh,Lớp học,Trạng thái,Giáo viên");
+            
+            foreach (var item in history)
+            {
+                var status = item.StatusName.Equals("ABSENT", StringComparison.OrdinalIgnoreCase) ? "Vắng mặt" : "Có mặt";
+                var teacher = string.IsNullOrWhiteSpace(item.TeacherName) ? "Không có" : item.TeacherName;
+                builder.AppendLine($"{item.AttendanceDate:dd/MM/yyyy},{item.StudentName},{item.ClassName},{status},{teacher}");
+            }
+            
+            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"LichSuDiemDanh_{DateTime.Now:yyyyMMdd}.csv");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportSession(Guid classId, Guid? scheduleId, DateTime? attendanceDate)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var model = await _attendanceService.GetAttendanceTakeViewAsync(classId, scheduleId, attendanceDate, userId.Value, GetCurrentRoleName());
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            var builder = new System.Text.StringBuilder();
+            builder.AppendLine("STT,Học sinh,Trạng thái");
+            
+            for (int i = 0; i < model.Students.Count; i++)
+            {
+                var student = model.Students[i];
+                var status = student.StatusName.Equals("ABSENT", StringComparison.OrdinalIgnoreCase) ? "Vắng mặt" : "Có mặt";
+                builder.AppendLine($"{i + 1},{student.StudentName},{status}");
+            }
+            
+            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"DiemDanhCaHoc_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+
         private Guid? GetCurrentUserId()
         {
             var userIdStr = HttpContext.Session.GetString(AppSessionKeys.UserId);

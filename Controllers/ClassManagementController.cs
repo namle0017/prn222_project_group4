@@ -149,6 +149,35 @@ namespace FapWeb.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ExportStudents(Guid id)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var model = await _classManagementService.GetStudentsAsync(id, userId.Value, GetCurrentRoleName());
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            var builder = new System.Text.StringBuilder();
+            builder.AppendLine("Học sinh,Người giám hộ,Ngày tham gia,Trạng thái");
+            
+            foreach (var student in model.Students)
+            {
+                var guardian = string.IsNullOrWhiteSpace(student.GuardianName) ? "Không có" : student.GuardianName;
+                var enrolledAt = student.EnrolledAt.HasValue ? student.EnrolledAt.Value.ToString("dd/MM/yyyy HH:mm") : "Không có";
+                var status = student.IsActive ? "Hoạt động" : "Không hoạt động";
+                builder.AppendLine($"{student.StudentName},{guardian},{enrolledAt},{status}");
+            }
+            
+            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"DanhSachHocSinh_{DateTime.Now:yyyyMMdd}.csv");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> AddStudent(Guid classId)
         {
             var userId = GetCurrentUserId();
