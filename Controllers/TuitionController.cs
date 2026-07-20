@@ -33,6 +33,36 @@ namespace FapWeb.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ExportTuition()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var data = await _tuitionService.GetTuitionStatusesAsync(userId.Value, GetCurrentRoleName());
+            
+            var builder = new System.Text.StringBuilder();
+            builder.AppendLine("Học sinh,Lớp học,Học phí yêu cầu,Đã nộp,Còn lại,Trạng thái,Hạn nộp");
+            
+            foreach (var item in data)
+            {
+                var dueDate = item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "Không có";
+                var status = item.StatusName switch
+                {
+                    "PAID" => "Đã nộp",
+                    "PARTIAL" => "Nộp một phần",
+                    "UNPAID" => "Chưa nộp",
+                    _ => item.StatusName
+                };
+                builder.AppendLine($"{item.StudentName},{item.ClassName},{item.RequiredFee},{item.PaidAmount},{item.RemainingAmount},{status},{dueDate}");
+            }
+            
+            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"QuanLyHocPhi_{DateTime.Now:yyyyMMdd}.csv");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> CreateFee()
         {
             var userId = GetCurrentUserId();
