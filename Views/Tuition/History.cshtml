@@ -1,7 +1,7 @@
 @model IEnumerable<FapWeb.Models.Dtos.TuitionDtos.PaymentHistoryDto>
 
 @{
-    ViewData["Title"] = "Payment History";
+    ViewData["Title"] = "Lịch sử thanh toán";
     var payments = Model.ToList();
     var totalAmount = payments.Sum(x => x.Amount);
 }
@@ -9,19 +9,19 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@ViewData["Title"]</h2>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back to Tuition</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Trở về Học phí</a>
     </div>
 
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body">
-            <div class="text-muted small">Total Payments</div>
+            <div class="text-muted small">Tổng thanh toán</div>
             <div class="fs-3 fw-semibold">@totalAmount.ToString("N0") VND</div>
         </div>
     </div>
 
     @if (!payments.Any())
     {
-        <div class="alert alert-info shadow-sm">No payment history found.</div>
+        <div class="alert alert-info shadow-sm">Không tìm thấy lịch sử thanh toán nào.</div>
     }
     else
     {
@@ -29,12 +29,12 @@
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th>Date</th>
-                        <th>Student</th>
-                        <th>Amount</th>
-                        <th>Note</th>
-                        <th>Recorded By</th>
-                        <th>Status</th>
+                        <th>Ngày</th>
+                        <th>Học sinh</th>
+                        <th>Số tiền</th>
+                        <th>Ghi chú</th>
+                        <th>Người ghi nhận</th>
+                        <th>Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>

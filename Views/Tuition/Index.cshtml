@@ -1,7 +1,7 @@
 @model IEnumerable<FapWeb.Models.Dtos.TuitionDtos.TuitionStudentStatusDto>
 
 @{
-    ViewData["Title"] = "Tuition Management";
+    ViewData["Title"] = "Quản lý học phí";
     var items = Model.ToList();
     var paid = items.Count(x => x.StatusName == "PAID");
     var partial = items.Count(x => x.StatusName == "PARTIAL");
@@ -12,8 +12,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@ViewData["Title"]</h2>
         <div class="d-flex gap-2">
-            <a asp-controller="Tuition" asp-action="CreateFee" class="btn btn-primary">+ Create Fee</a>
-            <a asp-controller="Tuition" asp-action="History" class="btn btn-outline-secondary">Payment History</a>
+            <a asp-controller="Tuition" asp-action="CreateFee" class="btn btn-primary">+ Tạo khoản thu</a>
+            <a asp-controller="Tuition" asp-action="History" class="btn btn-outline-secondary">Lịch sử thanh toán</a>
         </div>
     </div>
 
@@ -29,22 +29,22 @@
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Total Students</div><div class="fs-3 fw-semibold">@items.Count</div></div></div>
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Tổng số học sinh</div><div class="fs-3 fw-semibold">@items.Count</div></div></div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Paid</div><div class="fs-3 fw-semibold text-success">@paid</div></div></div>
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Đã nộp</div><div class="fs-3 fw-semibold text-success">@paid</div></div></div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Partial</div><div class="fs-3 fw-semibold text-warning">@partial</div></div></div>
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Nộp một phần</div><div class="fs-3 fw-semibold text-warning">@partial</div></div></div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Unpaid</div><div class="fs-3 fw-semibold text-danger">@unpaid</div></div></div>
+            <div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Chưa nộp</div><div class="fs-3 fw-semibold text-danger">@unpaid</div></div></div>
         </div>
     </div>
 
     @if (!items.Any())
     {
-        <div class="alert alert-info shadow-sm">No tuition records found.</div>
+        <div class="alert alert-info shadow-sm">Không tìm thấy bản ghi học phí nào.</div>
     }
     else
     {
@@ -52,13 +52,13 @@
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th>Student</th>
-                        <th>Class</th>
-                        <th>Required Fee</th>
-                        <th>Paid</th>
-                        <th>Remaining</th>
-                        <th>Status</th>
-                        <th>Due Date</th>
+                        <th>Học sinh</th>
+                        <th>Lớp học</th>
+                        <th>Học phí yêu cầu</th>
+                        <th>Đã nộp</th>
+                        <th>Còn lại</th>
+                        <th>Trạng thái</th>
+                        <th>Hạn nộp</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -82,13 +82,13 @@
                                     <form asp-action="PayOnline" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
-                                        <button type="submit" class="btn btn-sm btn-success" @(item.RemainingAmount <= 0 ? "disabled" : null)>Pay Online</button>
+                                        <button type="submit" class="btn btn-sm btn-success" @(item.RemainingAmount <= 0 ? "disabled" : null)>Thanh toán Online</button>
                                     </form>
-                                    <a asp-action="CreatePayment" asp-route-tuitionFeeId="@item.TuitionFeeId" class="btn btn-sm btn-primary">Record Payment</a>
+                                    <a asp-action="CreatePayment" asp-route-tuitionFeeId="@item.TuitionFeeId" class="btn btn-sm btn-primary">Ghi nhận thanh toán</a>
                                     <form asp-action="SendReminder" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" @(item.RemainingAmount <= 0 ? "disabled" : null)>Send Reminder</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" @(item.RemainingAmount <= 0 ? "disabled" : null)>Gửi nhắc nhở</button>
                                     </form>
                                 </div>
                             </td>

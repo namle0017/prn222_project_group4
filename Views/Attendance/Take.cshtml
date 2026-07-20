@@ -1,7 +1,7 @@
 @model FapWeb.Models.Dtos.AttendanceDtos.AttendanceTakeViewModel
 
 @{
-    ViewData["Title"] = "Take Attendance";
+    ViewData["Title"] = "Điểm danh";
 }
 
 <div class="container mt-4">
@@ -10,9 +10,9 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 class="mb-1">@ViewData["Title"]</h2>
-                    <div class="text-muted">Class: @Model.ClassName</div>
+                    <div class="text-muted">Lớp học: @Model.ClassName</div>
                 </div>
-                <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">Trở về</a>
             </div>
 
             @if (TempData["SuccessMessage"] != null)
@@ -33,30 +33,30 @@
                        asp-action="Create"
                        asp-route-classId="@Model.ClassId"
                        class="btn btn-sm btn-outline-primary">
-                        Create Schedule
+                        Tạo lịch học
                     </a>
                 </div>
             }
 
             @if (!Model.ScheduleOptions.Any())
             {
-                <div class="alert alert-info">This class does not have any schedules yet.</div>
+                <div class="alert alert-info">Lớp học này chưa có lịch học nào.</div>
             }
             else if (!Model.ScheduleId.HasValue)
             {
                 <form asp-action="Take" method="get" class="row g-3 mb-4">
                     <input type="hidden" name="classId" value="@Model.ClassId" />
                     <div class="col-md-4">
-                        <label class="form-label">Attendance Date</label>
+                        <label class="form-label">Ngày điểm danh</label>
                         <input type="date"
                                class="form-control"
                                name="attendanceDate"
                                value="@Model.AttendanceDate.ToString("yyyy-MM-dd")" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Schedule Session</label>
+                        <label class="form-label">Ca học</label>
                         <select class="form-select" name="scheduleId">
-                            <option value="">Select a schedule</option>
+                            <option value="">Chọn ca học</option>
                             @foreach (var option in Model.ScheduleOptions)
                             {
                                 <option value="@option.Value">@option.Label</option>
@@ -65,27 +65,27 @@
                     </div>
                     <div class="col-md-2 d-grid">
                         <label class="form-label d-none d-md-block">&nbsp;</label>
-                        <button type="submit" class="btn btn-primary">Load Session</button>
+                        <button type="submit" class="btn btn-primary">Tải ca học</button>
                     </div>
                 </form>
             }
             else if (!Model.Students.Any())
             {
-                <div class="alert alert-info">No students found in this class.</div>
+                <div class="alert alert-info">Không tìm thấy học sinh nào trong lớp.</div>
             }
             else
             {
                 <form asp-action="Take" method="get" class="row g-3 mb-4">
                     <input type="hidden" name="classId" value="@Model.ClassId" />
                     <div class="col-md-4">
-                        <label class="form-label">Attendance Date</label>
+                        <label class="form-label">Ngày điểm danh</label>
                         <input type="date"
                                class="form-control"
                                name="attendanceDate"
                                value="@Model.AttendanceDate.ToString("yyyy-MM-dd")" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Schedule Session</label>
+                        <label class="form-label">Ca học</label>
                         <select class="form-select" name="scheduleId">
                             @foreach (var option in Model.ScheduleOptions)
                             {
@@ -94,12 +94,12 @@
                         </select>
                         @if (!string.IsNullOrWhiteSpace(Model.ScheduleLabel))
                         {
-                            <div class="form-text">Selected session: @Model.ScheduleLabel</div>
+                            <div class="form-text">Ca học đã chọn: @Model.ScheduleLabel</div>
                         }
                     </div>
                     <div class="col-md-2 d-grid">
                         <label class="form-label d-none d-md-block">&nbsp;</label>
-                        <button type="submit" class="btn btn-outline-primary">Change Session</button>
+                        <button type="submit" class="btn btn-outline-primary">Đổi ca học</button>
                     </div>
                 </form>
 
@@ -114,8 +114,8 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>Student</th>
-                                    <th>Status</th>
+                                    <th>Học sinh</th>
+                                    <th>Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,7 +136,7 @@
                                                            value="PRESENT"
                                                            checked="@(Model.Students[i].StatusName != "ABSENT")" />
                                                     <label class="form-check-label">
-                                                        <span class="badge bg-success">Present</span>
+                                                        <span class="badge bg-success">Có mặt</span>
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
@@ -146,7 +146,7 @@
                                                            value="ABSENT"
                                                            checked="@(Model.Students[i].StatusName == "ABSENT")" />
                                                     <label class="form-check-label">
-                                                        <span class="badge bg-danger">Absent</span>
+                                                        <span class="badge bg-danger">Vắng mặt</span>
                                                     </label>
                                                 </div>
                                             </div>
@@ -157,7 +157,7 @@
                         </table>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Save Attendance</button>
+                    <button type="submit" class="btn btn-primary">Lưu điểm danh</button>
                 </form>
             }
         </div>

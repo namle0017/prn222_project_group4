@@ -1,13 +1,13 @@
 @model FapWeb.Models.Dtos.ClassManagementDtos.ClassManagementIndexDto
 
 @{
-    ViewData["Title"] = "Class Management";
+    ViewData["Title"] = "Quản lý lớp học";
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@ViewData["Title"]</h2>
-        <a asp-action="Create" class="btn btn-primary">Create Class</a>
+        <a asp-action="Create" class="btn btn-primary">Tạo lớp học</a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -21,19 +21,19 @@
     }
 
     <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Total Classes</div><div class="fs-3 fw-semibold">@Model.TotalClasses</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Active Classes</div><div class="fs-3 fw-semibold text-success">@Model.ActiveClasses</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Students Enrolled</div><div class="fs-3 fw-semibold">@Model.TotalStudentsEnrolled</div></div></div></div>
-        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Without Schedule</div><div class="fs-3 fw-semibold text-warning">@Model.ClassesWithoutSchedule</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Tổng số lớp</div><div class="fs-3 fw-semibold">@Model.TotalClasses</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Lớp đang hoạt động</div><div class="fs-3 fw-semibold text-success">@Model.ActiveClasses</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Học sinh đăng ký</div><div class="fs-3 fw-semibold">@Model.TotalStudentsEnrolled</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body"><div class="text-muted small">Chưa có lịch học</div><div class="fs-3 fw-semibold text-warning">@Model.ClassesWithoutSchedule</div></div></div></div>
     </div>
 
     <form asp-action="Index" method="get" class="row g-2 mb-4">
         <div class="col-md-4">
-            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Search class or teacher" />
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Tìm theo lớp hoặc giáo viên" />
         </div>
         <div class="col-md-3">
             <select name="teacherId" class="form-select">
-                <option value="">All Teachers</option>
+                <option value="">Tất cả giáo viên</option>
                 @foreach (var teacher in Model.TeacherOptions)
                 {
                     <option value="@teacher.Value" selected="@(Model.TeacherId?.ToString() == teacher.Value)">@teacher.Label</option>
@@ -42,20 +42,20 @@
         </div>
         <div class="col-md-3">
             <select name="statusFilter" class="form-select">
-                <option value="">All Statuses</option>
-                <option value="ACTIVE" selected="@(Model.StatusFilter == "ACTIVE")">Active</option>
-                <option value="UPCOMING" selected="@(Model.StatusFilter == "UPCOMING")">Upcoming</option>
-                <option value="INACTIVE" selected="@(Model.StatusFilter == "INACTIVE")">Inactive</option>
+                <option value="">Tất cả trạng thái</option>
+                <option value="ACTIVE" selected="@(Model.StatusFilter == "ACTIVE")">Đang hoạt động</option>
+                <option value="UPCOMING" selected="@(Model.StatusFilter == "UPCOMING")">Sắp tới</option>
+                <option value="INACTIVE" selected="@(Model.StatusFilter == "INACTIVE")">Không hoạt động</option>
             </select>
         </div>
         <div class="col-md-2 d-grid">
-            <button type="submit" class="btn btn-outline-primary">Filter</button>
+            <button type="submit" class="btn btn-outline-primary">Lọc</button>
         </div>
     </form>
 
     @if (!Model.Classes.Any())
     {
-        <div class="alert alert-info shadow-sm">No classes found.</div>
+        <div class="alert alert-info shadow-sm">Không tìm thấy lớp học nào.</div>
     }
     else
     {
@@ -63,12 +63,12 @@
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th>Class</th>
-                        <th>Teacher</th>
-                        <th>Room</th>
-                        <th>Students</th>
-                        <th>Schedules</th>
-                        <th>Status</th>
+                        <th>Lớp học</th>
+                        <th>Giáo viên</th>
+                        <th>Phòng học</th>
+                        <th>Số học sinh</th>
+                        <th>Lịch học</th>
+                        <th>Trạng thái</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -77,15 +77,15 @@
                     {
                         <tr>
                             <td>@item.ClassName</td>
-                            <td>@(string.IsNullOrWhiteSpace(item.TeacherName) ? "Unassigned" : item.TeacherName)</td>
-                            <td>@(string.IsNullOrWhiteSpace(item.RoomName) ? "N/A" : item.RoomName)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TeacherName) ? "Chưa phân công" : item.TeacherName)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.RoomName) ? "Không có" : item.RoomName)</td>
                             <td>@item.StudentCount</td>
                             <td>@item.ScheduleCount</td>
                             <td><span class="badge @(item.StatusName == "ACTIVE" ? "bg-success" : item.StatusName == "UPCOMING" ? "bg-warning text-dark" : "bg-secondary")">@item.StatusName</span></td>
                             <td class="text-end">
                                 <div class="d-flex gap-2 justify-content-end flex-wrap">
-                                    <a asp-action="Details" asp-route-id="@item.ClassId" class="btn btn-sm btn-outline-primary">Details</a>
-                                    <a asp-action="Edit" asp-route-id="@item.ClassId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a asp-action="Details" asp-route-id="@item.ClassId" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                                    <a asp-action="Edit" asp-route-id="@item.ClassId" class="btn btn-sm btn-outline-secondary">Sửa</a>
                                 </div>
                             </td>
                         </tr>
