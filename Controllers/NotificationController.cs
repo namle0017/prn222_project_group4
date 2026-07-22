@@ -1,13 +1,12 @@
+using FapWeb.Infrastructure;
 using FapWeb.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FapWeb.Controllers
 {
+    [RequireRole]
     public class NotificationController : Controller
     {
-        private const string UserIdSessionKey = "UserId";
-        private const string RoleNameSessionKey = "RoleName";
-
         private readonly INotificationService _notificationService;
 
         public NotificationController(INotificationService notificationService)
@@ -81,8 +80,10 @@ namespace FapWeb.Controllers
             return Json(new { count });
         }
 
+        // Gui nhac hoc phi la thao tac cua nha truong, khong phai cua hoc sinh/phu huynh.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
         public async Task<IActionResult> CreateTuitionReminder(Guid studentId, decimal? amount, DateTime? dueDate)
         {
             var userId = GetCurrentUserId();
@@ -97,15 +98,7 @@ namespace FapWeb.Controllers
 
         private Guid? GetCurrentUserId()
         {
-            var userIdStr = HttpContext.Session.GetString(UserIdSessionKey);
-
-            if (string.IsNullOrWhiteSpace(userIdStr) || !Guid.TryParse(userIdStr, out Guid userId))
-            {
-                return null;
-            }
-
-            _ = HttpContext.Session.GetString(RoleNameSessionKey);
-            return userId;
+            return HttpContext.Session.GetUserId();
         }
     }
 }
