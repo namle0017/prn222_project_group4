@@ -26,4 +26,10 @@
     <Folder Include="Models\Entities\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="FapWeb.Tests\**\*.cs" />
+    <Content Remove="FapWeb.Tests\**\*" />
+    <None Remove="FapWeb.Tests\**\*" />
+  </ItemGroup>
+
 </Project>

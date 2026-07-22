@@ -1,4 +1,6 @@
 using System.Net.Http.Headers;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using FapWeb.Infrastructure;
@@ -13,7 +15,25 @@ namespace FapWeb.Services.Service
 {
     public class ChatbotService : IChatbotService
     {
-        private enum ChatIntent { Guidance, Schedule, Attendance, Tuition, Notification }
+        private enum ChatIntent { Guidance, Schedule, Attendance, AttendanceSummary, Tuition, Notification }
+
+        private sealed record AttendancePeriod(DateOnly? StartDate, DateOnly EndDate, string Label);
+        private sealed record AuthorizedStudent(Guid Id, string FullName);
+        private sealed record AuthorizedClass(Guid Id, string ClassName);
+
+        private sealed class AttendanceRecordRow
+        {
+            public Guid StudentId { get; init; }
+            public Guid ScheduleId { get; init; }
+            public string StatusName { get; init; } = string.Empty;
+        }
+
+        private sealed class ScheduledSessionRow
+        {
+            public Guid StudentId { get; init; }
+            public Guid ScheduleId { get; init; }
+            public Guid ClassId { get; init; }
+        }
 
         private readonly PostgresContext _context;
         private readonly HttpClient _httpClient;
@@ -47,6 +67,11 @@ namespace FapWeb.Services.Service
                     SuggestedActionUrl = action.Url,
                     IsAvailable = false
                 };
+            }
+
+            if (intent == ChatIntent.AttendanceSummary && (AppRoles.IsParent(roleName) || AppRoles.IsStudent(roleName)))
+            {
+                return await GetAttendanceSummaryResponseAsync(normalizedMessage, currentUserId, roleName, cancellationToken);
             }
 
             if (string.IsNullOrWhiteSpace(_settings.ApiKey) || !Uri.TryCreate(_settings.ApiBaseUrl, UriKind.Absolute, out var endpoint))
@@ -129,6 +154,7 @@ namespace FapWeb.Services.Service
             {
                 ChatIntent.Schedule => await GetScheduleContextAsync(userId, roleName, cancellationToken),
                 ChatIntent.Attendance => await GetAttendanceContextAsync(userId, roleName, cancellationToken),
+                ChatIntent.AttendanceSummary => await GetAttendanceContextAsync(userId, roleName, cancellationToken),
                 ChatIntent.Tuition => await GetTuitionContextAsync(userId, roleName, cancellationToken),
                 ChatIntent.Notification => await GetNotificationContextAsync(userId, cancellationToken),
                 _ => "Không có dữ liệu cá nhân nào được cung cấp. Hãy hướng dẫn ngắn gọn về các chức năng lịch học, điểm danh, học phí và thông báo của FapWeb."
@@ -190,6 +216,255 @@ namespace FapWeb.Services.Service
                 : "Năm bản ghi điểm danh gần nhất được phép xem:\n" + string.Join('\n', items.Select(item => $"- {item.FullName}, {item.ClassName}, {item.ScheduleDate:dd/MM/yyyy}: {item.Status}"));
         }
 
+        private async Task<ChatbotResponseDto> GetAttendanceSummaryResponseAsync(string message, Guid userId, string roleName, CancellationToken cancellationToken)
+        {
+            List<AuthorizedStudent> authorizedStudents;
+            if (AppRoles.IsStudent(roleName))
+            {
+                authorizedStudents = await _context.Users
+                    .AsNoTracking()
+                    .Where(user => user.Id == userId)
+                    .Select(user => new AuthorizedStudent(user.Id, user.FullName))
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                authorizedStudents = await _context.StudentGuardians
+                    .AsNoTracking()
+                    .Where(link => link.GuardianId == userId)
+                    .Select(link => new AuthorizedStudent(link.StudentId, link.Student.FullName))
+                    .Distinct()
+                    .ToListAsync(cancellationToken);
+            }
+
+            if (authorizedStudents.Count == 0)
+            {
+                return AttendanceSummaryResponse("Tài khoản phụ huynh chưa được liên kết với học sinh nào. Vui lòng liên hệ quản trị viên để kiểm tra liên kết tài khoản.");
+            }
+
+            var selectedStudents = SelectMentionedStudents(message, authorizedStudents);
+            var studentIds = selectedStudents.Select(student => student.Id).ToList();
+            var enrolledClassRows = await _context.ClassStudents
+                .AsNoTracking()
+                .Where(link => studentIds.Contains(link.StudentId) && link.IsEnable != false)
+                .Select(link => new { link.ClassId, link.Class.ClassName })
+                .Distinct()
+                .ToListAsync(cancellationToken);
+            var authorizedClasses = enrolledClassRows
+                .Select(item => new AuthorizedClass(item.ClassId, item.ClassName))
+                .ToList();
+            var selectedClasses = SelectMentionedClasses(message, authorizedClasses);
+            var selectedClassIds = selectedClasses.Select(item => item.Id).ToHashSet();
+            var hasClassFilter = selectedClassIds.Count > 0;
+            var period = ResolveAttendancePeriod(message);
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+
+            var attendanceQuery = _context.AttendanceChecks
+                .AsNoTracking()
+                .Where(record => studentIds.Contains(record.StudentId))
+                .Where(record => record.Schedule.ScheduleDate <= period.EndDate)
+                .Where(record => record.Schedule.ScheduleDate < today || (record.Schedule.ScheduleDate == today && record.Schedule.EndTime <= now));
+
+            if (period.StartDate.HasValue)
+            {
+                attendanceQuery = attendanceQuery.Where(record => record.Schedule.ScheduleDate >= period.StartDate.Value);
+            }
+
+            if (hasClassFilter)
+            {
+                attendanceQuery = attendanceQuery.Where(record => selectedClassIds.Contains(record.Schedule.ClassId));
+            }
+
+            var attendanceRecords = await attendanceQuery
+                .Select(record => new AttendanceRecordRow
+                {
+                    StudentId = record.StudentId,
+                    ScheduleId = record.ScheduleId,
+                    StatusName = record.Status.StatusName
+                })
+                .ToListAsync(cancellationToken);
+
+            var scheduledQuery = _context.ClassStudents
+                .AsNoTracking()
+                .Where(link => studentIds.Contains(link.StudentId) && link.IsEnable != false)
+                .SelectMany(link => link.Class.Schedules
+                    .Where(schedule => schedule.ScheduleDate <= period.EndDate)
+                    .Where(schedule => schedule.ScheduleDate < today || (schedule.ScheduleDate == today && schedule.EndTime <= now)),
+                    (link, schedule) => new ScheduledSessionRow
+                    {
+                        StudentId = link.StudentId,
+                        ScheduleId = schedule.Id,
+                        ClassId = schedule.ClassId
+                    });
+
+            if (period.StartDate.HasValue)
+            {
+                var startDate = period.StartDate.Value;
+                scheduledQuery = _context.ClassStudents
+                    .AsNoTracking()
+                    .Where(link => studentIds.Contains(link.StudentId) && link.IsEnable != false)
+                    .SelectMany(link => link.Class.Schedules
+                        .Where(schedule => schedule.ScheduleDate >= startDate && schedule.ScheduleDate <= period.EndDate)
+                        .Where(schedule => schedule.ScheduleDate < today || (schedule.ScheduleDate == today && schedule.EndTime <= now)),
+                        (link, schedule) => new ScheduledSessionRow
+                        {
+                            StudentId = link.StudentId,
+                            ScheduleId = schedule.Id,
+                            ClassId = schedule.ClassId
+                        });
+            }
+
+            if (hasClassFilter)
+            {
+                scheduledQuery = scheduledQuery.Where(item => selectedClassIds.Contains(item.ClassId));
+            }
+
+            var scheduledSessions = await scheduledQuery.ToListAsync(cancellationToken);
+            var classDescription = hasClassFilter
+                ? " của " + string.Join(", ", selectedClasses.Select(item => item.ClassName))
+                : string.Empty;
+            var resultLines = new List<string>();
+
+            foreach (var student in selectedStudents)
+            {
+                var studentRecords = attendanceRecords.Where(record => record.StudentId == student.Id).ToList();
+                var present = studentRecords.Count(record => string.Equals(record.StatusName, "PRESENT", StringComparison.OrdinalIgnoreCase));
+                var absent = studentRecords.Count(record => string.Equals(record.StatusName, "ABSENT", StringComparison.OrdinalIgnoreCase));
+                var recorded = present + absent;
+                var recordedScheduleIds = studentRecords.Select(record => record.ScheduleId).ToHashSet();
+                var unmarked = scheduledSessions
+                    .Where(session => session.StudentId == student.Id && !recordedScheduleIds.Contains(session.ScheduleId))
+                    .Select(session => session.ScheduleId)
+                    .Distinct()
+                    .Count();
+
+                if (recorded == 0 && unmarked == 0)
+                {
+                    resultLines.Add($"{student.FullName}: chưa có buổi học đã qua trong {period.Label}{classDescription}.");
+                    continue;
+                }
+
+                if (recorded == 0)
+                {
+                    resultLines.Add($"{student.FullName}: có {unmarked} buổi học đã qua trong {period.Label}{classDescription}, nhưng chưa có kết quả điểm danh.");
+                    continue;
+                }
+
+                var attendanceRate = present * 100m / recorded;
+                var attendanceRateText = attendanceRate.ToString("0.#", CultureInfo.GetCultureInfo("vi-VN"));
+                var unmarkedText = unmarked > 0
+                    ? $" Có {unmarked} buổi đã qua chưa có kết quả điểm danh."
+                    : string.Empty;
+                resultLines.Add($"{student.FullName}: đã có kết quả {recorded} buổi trong {period.Label}{classDescription}, gồm {present} buổi có mặt và {absent} buổi vắng. Tỷ lệ chuyên cần {attendanceRateText}%.{unmarkedText}");
+            }
+
+            var answer = resultLines.Count == 1
+                ? "Tôi đã kiểm tra lịch và điểm danh. " + resultLines[0]
+                : "Tôi đã kiểm tra lịch và điểm danh của các học sinh được liên kết:\n" + string.Join('\n', resultLines.Select((line, index) => $"{index + 1}. {line}"));
+            answer += !hasClassFilter && !period.StartDate.HasValue
+                ? "\nBạn có thể hỏi tiếp theo tháng hoặc tên môn học để tôi lọc chi tiết hơn."
+                : "\nBạn có thể mở lịch sử điểm danh để xem từng buổi cụ thể.";
+            return AttendanceSummaryResponse(answer);
+        }
+
+        private static ChatbotResponseDto AttendanceSummaryResponse(string answer)
+        {
+            return new ChatbotResponseDto
+            {
+                Answer = answer,
+                SuggestedActionLabel = "Mở lịch sử điểm danh",
+                SuggestedActionUrl = "/Attendance/History"
+            };
+        }
+
+        private static List<AuthorizedStudent> SelectMentionedStudents(string message, List<AuthorizedStudent> authorizedStudents)
+        {
+            var normalizedMessage = NormalizeForMatching(message);
+            var messageTokens = Tokenize(normalizedMessage).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var matches = authorizedStudents.Where(student =>
+            {
+                var normalizedName = NormalizeForMatching(student.FullName);
+                if (normalizedMessage.Contains(normalizedName, StringComparison.Ordinal)) return true;
+                var nameTokens = Tokenize(normalizedName).Where(token => token.Length >= 3).ToList();
+                return nameTokens.Count > 0 && messageTokens.Contains(nameTokens[^1]);
+            }).ToList();
+
+            return matches.Count > 0 ? matches : authorizedStudents;
+        }
+
+        private static List<AuthorizedClass> SelectMentionedClasses(string message, List<AuthorizedClass> authorizedClasses)
+        {
+            if (authorizedClasses.Count == 0) return new List<AuthorizedClass>();
+
+            var normalizedMessage = NormalizeForMatching(message);
+            var messageTokens = Tokenize(normalizedMessage).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var ignoredTokens = new HashSet<string>(new[] { "lap", "trinh", "mon", "hoc", "lop", "co", "ban", "cua", "con", "toi" }, StringComparer.OrdinalIgnoreCase);
+            var scored = authorizedClasses.Select(classItem =>
+            {
+                var normalizedClassName = NormalizeForMatching(classItem.ClassName);
+                if (normalizedMessage.Contains(normalizedClassName, StringComparison.Ordinal)) return (Item: classItem, Score: 100);
+                if (message.Contains("c#", StringComparison.OrdinalIgnoreCase) && classItem.ClassName.Contains("c#", StringComparison.OrdinalIgnoreCase)) return (Item: classItem, Score: 90);
+                var tokens = Tokenize(normalizedClassName).Where(token => token.Length >= 3 && !ignoredTokens.Contains(token)).Distinct().ToList();
+                return (Item: classItem, Score: tokens.Count(messageTokens.Contains));
+            }).ToList();
+            var maximumScore = scored.Max(item => item.Score);
+            return maximumScore <= 0
+                ? new List<AuthorizedClass>()
+                : scored.Where(item => item.Score == maximumScore).Select(item => item.Item).ToList();
+        }
+
+        private static AttendancePeriod ResolveAttendancePeriod(string message)
+        {
+            var normalized = NormalizeForMatching(message);
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            if (normalized.Contains("hom nay", StringComparison.Ordinal))
+            {
+                return new AttendancePeriod(today, today, $"hôm nay ({today:dd/MM/yyyy})");
+            }
+
+            if (normalized.Contains("tuan nay", StringComparison.Ordinal))
+            {
+                var daysSinceMonday = ((int)today.DayOfWeek + 6) % 7;
+                var start = today.AddDays(-daysSinceMonday);
+                return new AttendancePeriod(start, today, $"tuần này ({start:dd/MM/yyyy}–{today:dd/MM/yyyy})");
+            }
+
+            if (normalized.Contains("thang truoc", StringComparison.Ordinal))
+            {
+                var firstDayThisMonth = new DateOnly(today.Year, today.Month, 1);
+                var end = firstDayThisMonth.AddDays(-1);
+                var start = new DateOnly(end.Year, end.Month, 1);
+                return new AttendancePeriod(start, end, $"tháng {end:MM/yyyy}");
+            }
+
+            if (normalized.Contains("thang nay", StringComparison.Ordinal))
+            {
+                var start = new DateOnly(today.Year, today.Month, 1);
+                return new AttendancePeriod(start, today, $"tháng {today:MM/yyyy}");
+            }
+
+            return new AttendancePeriod(null, today, $"toàn bộ lịch sử đến {today:dd/MM/yyyy}");
+        }
+
+        private static string NormalizeForMatching(string value)
+        {
+            var decomposed = value.Trim().ToLowerInvariant().Normalize(NormalizationForm.FormD);
+            var builder = new StringBuilder(decomposed.Length);
+            foreach (var character in decomposed)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
+                {
+                    builder.Append(character == 'đ' ? 'd' : character);
+                }
+            }
+
+            return Regex.Replace(builder.ToString().Normalize(NormalizationForm.FormC), @"\s+", " ");
+        }
+
+        private static IEnumerable<string> Tokenize(string value) => Regex.Matches(value, @"[a-z0-9]+")
+            .Select(match => match.Value);
+
         private async Task<string> GetTuitionContextAsync(Guid userId, string roleName, CancellationToken cancellationToken)
         {
             var query = _context.TuitionFees.AsNoTracking().AsQueryable();
@@ -247,11 +522,20 @@ namespace FapWeb.Services.Service
         private static ChatIntent DetectIntent(string message)
         {
             var lower = message.ToLowerInvariant();
+            var normalized = NormalizeForMatching(message);
+            if (IsAttendanceSummaryQuestion(normalized)) return ChatIntent.AttendanceSummary;
             if (ContainsAny(lower, "điểm danh", "vắng", "có mặt", "chuyên cần")) return ChatIntent.Attendance;
             if (ContainsAny(lower, "học phí", "thanh toán", "đã đóng", "còn nợ", "khoản phí")) return ChatIntent.Tuition;
             if (ContainsAny(lower, "thông báo", "nhắc nhở", "unread", "chưa đọc")) return ChatIntent.Notification;
             if (ContainsAny(lower, "lịch", "buổi học", "buổi dạy", "lớp hôm nay", "schedule")) return ChatIntent.Schedule;
             return ChatIntent.Guidance;
+        }
+
+        private static bool IsAttendanceSummaryQuestion(string normalizedMessage)
+        {
+            var asksForQuantity = ContainsAny(normalizedMessage, "bao nhieu", "may buoi", "tong so", "ty le", "phan tram");
+            var concernsAttendance = ContainsAny(normalizedMessage, "diem danh", "vang", "co mat", "di hoc", "den lop", "chuyen can", "nghi hoc");
+            return asksForQuantity && concernsAttendance;
         }
 
         private static bool ContainsAny(string text, params string[] values) => values.Any(text.Contains);
@@ -272,6 +556,8 @@ namespace FapWeb.Services.Service
             return intent switch
             {
                 ChatIntent.Attendance when AppRoles.IsStudent(roleName) || AppRoles.IsParent(roleName) => ("Mở lịch sử điểm danh", "/Attendance/History"),
+                ChatIntent.AttendanceSummary when AppRoles.IsStudent(roleName) || AppRoles.IsParent(roleName) => ("Mở lịch sử điểm danh", "/Attendance/History"),
+                ChatIntent.AttendanceSummary => ("Mở điểm danh", "/Attendance"),
                 ChatIntent.Attendance => ("Mở điểm danh", "/Attendance"),
                 ChatIntent.Tuition => ("Mở học phí", "/Tuition"),
                 ChatIntent.Notification => ("Mở thông báo", "/Notification"),

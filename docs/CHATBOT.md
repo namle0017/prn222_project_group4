@@ -55,11 +55,24 @@ Intent hiện được nhận diện bằng keyword tiếng Việt trong `Chatbo
 | --- | --- | --- |
 | `Schedule` | lịch, buổi học, buổi dạy | Student/Parent: `/Dashboard`; Staff: `/ScheduleManagement` |
 | `Attendance` | điểm danh, vắng, có mặt, chuyên cần | Student/Parent: `/Attendance/History`; Staff: `/Attendance` |
+| `AttendanceSummary` | bao nhiêu buổi, mấy buổi, tổng số, tỷ lệ chuyên cần kết hợp với từ khóa điểm danh | Student/Parent: `/Attendance/History`; Staff: `/Attendance` |
 | `Tuition` | học phí, thanh toán, còn nợ | `/Tuition` |
 | `Notification` | thông báo, nhắc nhở, chưa đọc | `/Notification` |
 | `Guidance` | các câu còn lại | `/Dashboard` |
 
 Prompt yêu cầu MiMo trả lời tiếng Việt, plain text, tối đa năm ý ngắn. `NormalizeAnswer` loại bỏ Markdown phổ biến (`**`, `__`, backtick, heading) và chuyển bullet `*`/`-` thành `•`. Khi thay đổi quy tắc này, phải giữ output an toàn cho `textContent`; không dùng `innerHTML` để render câu trả lời từ model.
+
+### Thống kê có mặt/vắng của phụ huynh và học sinh
+
+`AttendanceSummary` là nhánh trả lời xác định ở server và chạy trước bước kiểm tra cấu hình MiMo. Server tự đếm `PRESENT`, `ABSENT`, tổng số buổi đã có kết quả, tỷ lệ chuyên cần và số lịch quá khứ chưa được điểm danh. Không gửi toàn bộ lịch sử sang MiMo và không để model tự cộng số liệu.
+
+- Không nêu thời gian: tính toàn bộ lịch sử đến ngày hiện tại.
+- Hỗ trợ `hôm nay`, `tuần này`, `tháng này`, `tháng trước`.
+- Có thể nhận diện tên học sinh đã liên kết và tên lớp/môn trong câu hỏi.
+- Một phụ huynh có nhiều con nhưng không nêu tên: trả kết quả riêng cho từng con.
+- Buổi chưa có bản ghi điểm danh được báo riêng, không tự coi là vắng.
+- Học sinh hoặc lớp được chọn chỉ từ quan hệ server đã xác thực; client không gửi `studentId`, `classId` hay role.
+- Vì không phụ thuộc MiMo, thống kê này vẫn hoạt động khi thiếu API key, timeout hoặc provider hết quota.
 
 ## 5. Cấu hình và chạy cục bộ
 
@@ -99,16 +112,20 @@ Client không được gọi trực tiếp MiMo. API key chỉ được dùng tr
 ### Smoke test trước khi bàn giao
 
 1. Chạy `dotnet build FapWeb.csproj --no-restore`.
-2. Khởi động app, đăng nhập bằng từng role có sẵn.
-3. Mở widget ở desktop và màn hình hẹp; kiểm tra đóng bằng `Esc`, gửi bằng `Enter`, xuống dòng bằng `Shift+Enter`.
-4. Hỏi một câu cho từng intent trong bảng ở phần 4. Kiểm tra chỉ có một link nội bộ đúng role.
-5. Gửi câu hỏi tạo câu trả lời có Markdown (ví dụ yêu cầu “liệt kê chi tiết”); xác nhận không thấy `**`, heading hoặc bullet `*` thô.
-6. Refresh trang hoặc logout/login; xác nhận lịch sử chat biến mất.
+2. Chạy `dotnet test FapWeb.Tests/FapWeb.Tests.csproj --no-restore` để kiểm tra thống kê điểm danh, quyền phụ huynh và lọc lớp.
+3. Khởi động app, đăng nhập bằng từng role có sẵn.
+4. Mở widget ở desktop và màn hình hẹp; kiểm tra đóng bằng `Esc`, gửi bằng `Enter`, xuống dòng bằng `Shift+Enter`.
+5. Hỏi một câu cho từng intent trong bảng ở phần 4. Kiểm tra chỉ có một link nội bộ đúng role.
+6. Gửi câu hỏi tạo câu trả lời có Markdown (ví dụ yêu cầu “liệt kê chi tiết”); xác nhận không thấy `**`, heading hoặc bullet `*` thô.
+7. Refresh trang hoặc logout/login; xác nhận lịch sử chat biến mất.
+8. Với tài khoản Parent, hỏi “Con tôi đã có mặt và vắng bao nhiêu buổi?”, sau đó thử thêm “tháng này”, “tháng trước” và tên lớp. Đối chiếu tổng với `/Attendance/History`.
 
 ### Kiểm thử quyền bắt buộc
 
 - Student không thể nhận lịch/điểm danh/học phí của student khác.
 - Parent chỉ nhận dữ liệu của child đã liên kết.
+- Parent có nhiều child nhận từng dòng riêng; khi nêu tên chỉ nhận child tương ứng.
+- `PRESENT + ABSENT` bằng tổng buổi đã có kết quả; lịch quá khứ chưa điểm danh không bị tính là `ABSENT`.
 - Teacher chỉ nhận dữ liệu của lớp mình phụ trách.
 - Admin hỏi “liệt kê toàn bộ học phí/học sinh” phải nhận hướng dẫn, không nhận dữ liệu tổng hợp.
 
@@ -139,6 +156,6 @@ Client không được gọi trực tiếp MiMo. API key chỉ được dùng tr
 
 ## 10. Dữ liệu demo để test chatbot
 
-`DemoDataSeeder` chỉ chạy khi `DemoData__SeedOnStartup=true` và có `DemoData__Password`. Nó tạo/cập nhật bốn account demo, hai lớp lập trình, lịch học, liên kết phụ huynh–học sinh, điểm danh, học phí và thông báo. Seeder idempotent, nên chạy lại không tạo bản ghi trùng theo các khóa nghiệp vụ.
+`DemoDataSeeder` chỉ chạy khi `DemoData__SeedOnStartup=true` và có `DemoData__Password`. Nó tạo/cập nhật bốn account demo, hai lớp lập trình, lịch học, liên kết phụ huynh–học sinh, điểm danh, học phí và thông báo. Dữ liệu điểm danh gồm tám buổi quá khứ có cả `PRESENT`/`ABSENT` và một buổi chưa điểm danh để kiểm tra thống kê. Seeder idempotent, nên chạy lại trong cùng ngày không tạo bản ghi trùng theo các khóa nghiệp vụ.
 
 Sau khi seed xong, đặt lại `DemoData__SeedOnStartup=false` rồi restart app để tránh seed ở mọi lần khởi động. Không bật cờ này ở production.
