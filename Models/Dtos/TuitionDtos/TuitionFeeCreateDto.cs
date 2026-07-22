@@ -19,6 +19,10 @@ namespace FapWeb.Models.Dtos.TuitionDtos
         [Display(Name = "Tháng học phí")]
         public string BillingMonth { get; set; } = DateTime.Today.ToString("yyyy-MM");
 
+        [StringLength(255)]
+        [Display(Name = "Nội dung khoản thu")]
+        public string? Description { get; set; }
+
         public List<SelectListItem> ClassOptions { get; set; } = new();
     }
 }

@@ -23,5 +23,7 @@ namespace FapWeb.Models.Dtos.TuitionDtos
         public string StatusName { get; set; } = string.Empty;
 
         public DateOnly? DueDate { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
     }
 }

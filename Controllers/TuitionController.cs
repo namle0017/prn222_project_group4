@@ -116,6 +116,12 @@ namespace FapWeb.Controllers
             {
                 TempData["ErrorMessage"] = error;
             }
+            else if (created == 0)
+            {
+                TempData["ErrorMessage"] = skipped > 0
+                    ? $"Không tạo khoản nào. Bỏ qua {skipped} học sinh đã có học phí tháng này."
+                    : "Không có học sinh hợp lệ để tạo học phí.";
+            }
             else
             {
                 TempData["SuccessMessage"] = skipped > 0

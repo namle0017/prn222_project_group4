@@ -58,8 +58,7 @@ namespace FapWeb.Services.Service
             // Phí "khác" đang chờ duyệt chỉ hiện ở trang Approvals; bảng học phí chỉ hiện phí đã duyệt.
             query = query.Where(x => x.ApprovalStatus == ApprovalApproved);
 
-            return await query
-                .OrderBy(x => x.Student.FullName)
+            var list = await query
                 .Select(x => new TuitionStudentStatusDto
                 {
                     TuitionFeeId = x.Id,
@@ -72,9 +71,24 @@ namespace FapWeb.Services.Service
                     PaidAmount = x.PaidAmount ?? 0,
                     RemainingAmount = x.TotalAmount - (x.PaidAmount ?? 0),
                     StatusName = GetTuitionStatusName(x.TotalAmount, x.PaidAmount ?? 0),
-                    DueDate = x.DueDate
+                    DueDate = x.DueDate,
+                    CreatedAt = x.CreatedAt
                 })
                 .ToListAsync();
+
+            // UNPAID sắp đến hạn (trong 1 tuần, gồm cả quá hạn) lên đầu theo hạn tăng dần;
+            // phần còn lại theo khoản mới tạo trước.
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var weekAhead = today.AddDays(7);
+            bool IsUrgent(TuitionStudentStatusDto x) =>
+                x.StatusName == "UNPAID" && x.DueDate.HasValue && x.DueDate.Value <= weekAhead;
+
+            return list
+                .OrderBy(x => IsUrgent(x) ? 0 : 1)
+                .ThenBy(x => IsUrgent(x) ? x.DueDate!.Value : DateOnly.MaxValue)
+                .ThenByDescending(x => x.CreatedAt ?? DateTime.MinValue)
+                .ThenBy(x => x.StudentName)
+                .ToList();
         }
 
         public async Task<PaymentCreateDto?> GetPaymentCreateAsync(Guid tuitionFeeId, Guid currentUserId, string? roleName)
@@ -279,10 +293,12 @@ namespace FapWeb.Services.Service
                 return (0, 0, "Lớp này chưa có học sinh nào.");
             }
 
-            // Học sinh đã có học phí của lớp này trong tháng được chọn thì bỏ qua
+            // Học sinh đã có HỌC PHÍ THÁNG của lớp này trong tháng được chọn thì bỏ qua
+            // (chỉ tính FeeType=TUITION; phí khác trùng tháng không được chặn học phí tháng)
             var existingStudentIds = await _context.TuitionFees
                 .AsNoTracking()
                 .Where(x => x.ClassId == request.ClassId.Value &&
+                            x.FeeType == FeeTypeTuition &&
                             studentIds.Contains(x.StudentId) &&
                             x.DueDate >= monthStart && x.DueDate <= monthEnd)
                 .Select(x => x.StudentId)
@@ -297,6 +313,9 @@ namespace FapWeb.Services.Service
 
             var tuitionStatusIds = await EnsureTuitionStatusesAsync();
             var now = DateTime.UtcNow;
+            var description = string.IsNullOrWhiteSpace(request.Description)
+                ? $"Học phí tháng {request.BillingMonth}"
+                : request.Description.Trim();
 
             foreach (var studentId in newStudentIds)
             {
@@ -309,7 +328,7 @@ namespace FapWeb.Services.Service
                     PaidAmount = 0,
                     DueDate = monthEnd,
                     StatusId = tuitionStatusIds["UNPAID"],
-                    Description = $"Học phí tháng {request.BillingMonth}",
+                    Description = description,
                     FeeType = FeeTypeTuition,
                     ApprovalStatus = ApprovalApproved,
                     CreatedBy = currentUserId,
@@ -318,7 +337,15 @@ namespace FapWeb.Services.Service
                 });
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return (0, existingStudentIds.Count, "Không lưu được học phí: " + ex.GetBaseException().Message);
+            }
+
             return (newStudentIds.Count, existingStudentIds.Count, null);
         }
 
