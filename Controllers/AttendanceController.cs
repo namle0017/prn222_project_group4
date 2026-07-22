@@ -5,6 +5,9 @@ using FapWeb.Infrastructure;
 
 namespace FapWeb.Controllers
 {
+    // Moi action deu yeu cau dang nhap; rieng cac man hinh diem danh
+    // duoc gioi han them cho ADMIN va TEACHER o tung action ben duoi.
+    [RequireRole]
     public class AttendanceController : Controller
     {
         private readonly IAttendanceService _attendanceService;
@@ -15,6 +18,7 @@ namespace FapWeb.Controllers
         }
 
         [HttpGet]
+        [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
         public async Task<IActionResult> Index()
         {
             var userId = GetCurrentUserId();
@@ -28,6 +32,7 @@ namespace FapWeb.Controllers
         }
 
         [HttpGet]
+        [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
         public async Task<IActionResult> Take(Guid classId, Guid? scheduleId, DateTime? attendanceDate)
         {
             var userId = GetCurrentUserId();
@@ -47,6 +52,7 @@ namespace FapWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
         public async Task<IActionResult> Take(AttendanceSaveRequestDto request)
         {
             var userId = GetCurrentUserId();
@@ -108,6 +114,7 @@ namespace FapWeb.Controllers
         }
 
         [HttpGet]
+        [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
         public async Task<IActionResult> ExportSession(Guid classId, Guid? scheduleId, DateTime? attendanceDate)
         {
             var userId = GetCurrentUserId();

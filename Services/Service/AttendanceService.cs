@@ -21,6 +21,13 @@ namespace FapWeb.Services.Service
 
         public async Task<List<AttendanceClassDto>> GetAttendanceClassesAsync(Guid currentUserId, string? roleName)
         {
+            // Truoc day chi loc theo TEACHER, nen STUDENT/PARENT mo /Attendance
+            // se thay toan bo lop trong he thong kem ten giao vien va si so.
+            if (!CanManageAttendance(roleName))
+            {
+                return new List<AttendanceClassDto>();
+            }
+
             var query = _context.Classes
                 .AsNoTracking()
                 .Include(x => x.Teacher)
