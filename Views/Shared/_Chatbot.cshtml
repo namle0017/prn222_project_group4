@@ -4,7 +4,7 @@
     var suggestedQuestions = AppRoles.IsTeacher(roleName)
         ? new[] { "Lịch dạy sắp tới của tôi", "Tình hình điểm danh gần đây", "Học phí của lớp tôi" }
         : AppRoles.IsParent(roleName)
-            ? new[] { "Lịch học sắp tới của con", "Điểm danh gần đây", "Học phí còn lại" }
+            ? new[] { "Con tôi đã có mặt và vắng bao nhiêu buổi?", "Tháng này con tôi vắng bao nhiêu buổi?", "Lịch học sắp tới của con" }
             : AppRoles.IsStudent(roleName)
                 ? new[] { "Lịch học sắp tới", "Điểm danh của tôi", "Học phí của tôi" }
                 : new[] { "Hướng dẫn quản lý lớp", "Hướng dẫn điểm danh", "Hướng dẫn quản lý học phí" };

@@ -19,6 +19,11 @@ namespace FapWeb.Services.Service
 
         public async Task<ClassManagementIndexDto> GetIndexAsync(string? searchTerm, Guid? teacherId, string? statusFilter, Guid currentUserId, string? roleName)
         {
+            if (!CanManageClasses(roleName))
+            {
+                return new ClassManagementIndexDto();
+            }
+
             var query = _context.Classes
                 .AsNoTracking()
                 .Include(x => x.Teacher)
@@ -91,9 +96,15 @@ namespace FapWeb.Services.Service
 
         public async Task<ClassFormDto?> GetEditModelAsync(Guid classId, Guid currentUserId, string? roleName)
         {
+            if (!CanManageClasses(roleName))
+            {
+                return null;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classEntity = await _context.Classes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == classId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == classId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (classEntity == null)
             {
@@ -136,13 +147,14 @@ namespace FapWeb.Services.Service
 
         public async Task<bool> UpdateAsync(ClassFormDto request, Guid currentUserId, string? roleName)
         {
-            if (request.Id == null)
+            if (request.Id == null || !CanManageClasses(roleName))
             {
                 return false;
             }
 
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var entity = await _context.Classes
-                .FirstOrDefaultAsync(x => x.Id == request.Id.Value && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == request.Id.Value && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (entity == null)
             {
@@ -164,6 +176,12 @@ namespace FapWeb.Services.Service
 
         public async Task<ClassDetailsDto?> GetDetailsAsync(Guid classId, Guid currentUserId, string? roleName)
         {
+            if (!CanManageClasses(roleName))
+            {
+                return null;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classEntity = await _context.Classes
                 .AsNoTracking()
                 .Include(x => x.Teacher)
@@ -174,7 +192,7 @@ namespace FapWeb.Services.Service
                 .Include(x => x.Schedules)
                     .ThenInclude(x => x.AttendanceChecks)
                 .Include(x => x.TuitionFees)
-                .FirstOrDefaultAsync(x => x.Id == classId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == classId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (classEntity == null)
             {
@@ -246,9 +264,15 @@ namespace FapWeb.Services.Service
 
         public async Task<AddStudentToClassDto?> GetAddStudentModelAsync(Guid classId, Guid currentUserId, string? roleName)
         {
+            if (!CanManageClasses(roleName))
+            {
+                return null;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classEntity = await _context.Classes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == classId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == classId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (classEntity == null)
             {
@@ -282,8 +306,14 @@ namespace FapWeb.Services.Service
 
         public async Task<bool> AddStudentAsync(AddStudentToClassDto request, Guid currentUserId, string? roleName)
         {
+            if (!CanManageClasses(roleName))
+            {
+                return false;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classEntity = await _context.Classes
-                .FirstOrDefaultAsync(x => x.Id == request.ClassId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == request.ClassId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (classEntity == null)
             {
@@ -330,9 +360,15 @@ namespace FapWeb.Services.Service
 
         public async Task<bool> RemoveStudentAsync(Guid classId, Guid studentId, Guid currentUserId, string? roleName)
         {
+            if (!CanManageClasses(roleName))
+            {
+                return false;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classEntity = await _context.Classes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == classId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == classId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (classEntity == null)
             {
@@ -366,6 +402,16 @@ namespace FapWeb.Services.Service
                     Label = x.FullName
                 })
                 .ToListAsync();
+        }
+
+        /// <summary>
+        /// Chi ADMIN va TEACHER duoc vao khu vuc quan ly lop.
+        /// Truoc day dieu kien la "!IsTeacher(role) || TeacherId == currentUserId", nen
+        /// STUDENT/PARENT thoa ve trai va di qua duoc nhu ADMIN.
+        /// </summary>
+        private static bool CanManageClasses(string? roleName)
+        {
+            return AppRoles.IsStaff(roleName);
         }
 
         private static string GetClassStatusName(DateOnly? startDate, DateOnly? endDate)

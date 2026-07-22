@@ -116,19 +116,19 @@ namespace FapWeb.Services.Service
             }
 
             var createdAt = DateTime.UtcNow;
-            var attendanceDateText = attendanceDate.ToString("yyyy-MM-dd");
+            var attendanceDateText = attendanceDate.ToString("dd/MM/yyyy");
 
             var notifications = guardians.Select(studentGuardian =>
             {
                 var studentName = studentGuardian.Student?.FullName;
-                var studentDisplayName = string.IsNullOrWhiteSpace(studentName) ? "the student" : studentName;
+                var studentDisplayName = string.IsNullOrWhiteSpace(studentName) ? "Học sinh" : studentName;
 
                 return new Notification
                 {
                     SenderId = teacherId,
                     ReceiverId = studentGuardian.GuardianId,
-                    Title = "Absence Notification",
-                    Content = $"{studentDisplayName} was marked absent on {attendanceDateText}.",
+                    Title = "Thông báo vắng học",
+                    Content = $"{studentDisplayName} được ghi nhận vắng mặt buổi học ngày {attendanceDateText}.",
                     IsRead = false,
                     CreatedAt = createdAt
                 };
@@ -156,27 +156,27 @@ namespace FapWeb.Services.Service
             var notifications = guardians.Select(studentGuardian =>
             {
                 var studentName = studentGuardian.Student?.FullName;
-                var studentDisplayName = string.IsNullOrWhiteSpace(studentName) ? "the student" : studentName;
+                var studentDisplayName = string.IsNullOrWhiteSpace(studentName) ? "Học sinh" : studentName;
 
-                var content = $"Student {studentDisplayName} has unpaid tuition";
+                var content = $"{studentDisplayName} còn khoản học phí chưa đóng";
 
                 if (amount.HasValue)
                 {
-                    content += $" of {amount.Value:N0} VND";
+                    content += $" là {amount.Value:N0} VND";
                 }
 
                 if (dueDate.HasValue)
                 {
-                    content += $" due on {dueDate.Value:dd/MM/yyyy}";
+                    content += $", hạn đóng ngày {dueDate.Value:dd/MM/yyyy}";
                 }
 
-                content += ". Please check tuition history.";
+                content += ". Vui lòng kiểm tra lịch sử thanh toán.";
 
                 return new Notification
                 {
                     SenderId = teacherId,
                     ReceiverId = studentGuardian.GuardianId,
-                    Title = "Tuition Reminder",
+                    Title = "Nhắc đóng học phí",
                     Content = content,
                     IsRead = false,
                     CreatedAt = createdAt

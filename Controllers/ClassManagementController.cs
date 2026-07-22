@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FapWeb.Controllers
 {
+    // Toan bo khu vuc quan ly lop chi danh cho ADMIN va TEACHER.
+    // Menu trong _Layout da an voi cac vai tro khac, nhung truoc day go
+    // thang URL van vao duoc nen can chan o day.
+    [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
     public class ClassManagementController : Controller
     {
         private readonly IClassManagementService _classManagementService;
@@ -56,8 +60,8 @@ namespace FapWeb.Controllers
 
             var classId = await _classManagementService.CreateAsync(request);
             TempData[classId.HasValue ? "SuccessMessage" : "ErrorMessage"] = classId.HasValue
-                ? "Class created successfully."
-                : "Unable to create class.";
+                ? "Tạo lớp học thành công."
+                : "Không thể tạo lớp học.";
 
             return classId.HasValue
                 ? RedirectToAction(nameof(Details), new { id = classId.Value })
@@ -104,8 +108,8 @@ namespace FapWeb.Controllers
 
             var updated = await _classManagementService.UpdateAsync(request, userId.Value, GetCurrentRoleName());
             TempData[updated ? "SuccessMessage" : "ErrorMessage"] = updated
-                ? "Class updated successfully."
-                : "Unable to update class.";
+                ? "Cập nhật lớp học thành công."
+                : "Không thể cập nhật lớp học.";
 
             return updated && request.Id.HasValue
                 ? RedirectToAction(nameof(Details), new { id = request.Id.Value })
@@ -171,10 +175,10 @@ namespace FapWeb.Controllers
                 var guardian = string.IsNullOrWhiteSpace(student.GuardianName) ? "Không có" : student.GuardianName;
                 var enrolledAt = student.EnrolledAt.HasValue ? student.EnrolledAt.Value.ToString("dd/MM/yyyy HH:mm") : "Không có";
                 var status = student.IsActive ? "Hoạt động" : "Không hoạt động";
-                builder.AppendLine($"{student.StudentName},{guardian},{enrolledAt},{status}");
+                builder.AppendLine(CsvHelper.Row(student.StudentName, guardian, enrolledAt, status));
             }
-            
-            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"DanhSachHocSinh_{DateTime.Now:yyyyMMdd}.csv");
+
+            return File(CsvHelper.ToFileBytes(builder), "text/csv", $"DanhSachHocSinh_{DateTime.Now:yyyyMMdd}.csv");
         }
 
         [HttpGet]
@@ -215,8 +219,8 @@ namespace FapWeb.Controllers
 
             var added = await _classManagementService.AddStudentAsync(request, userId.Value, GetCurrentRoleName());
             TempData[added ? "SuccessMessage" : "ErrorMessage"] = added
-                ? "Student added successfully."
-                : "Unable to add student.";
+                ? "Thêm học sinh vào lớp thành công."
+                : "Không thể thêm học sinh vào lớp.";
 
             return RedirectToAction(nameof(Students), new { id = request.ClassId });
         }
@@ -233,8 +237,8 @@ namespace FapWeb.Controllers
 
             var removed = await _classManagementService.RemoveStudentAsync(classId, studentId, userId.Value, GetCurrentRoleName());
             TempData[removed ? "SuccessMessage" : "ErrorMessage"] = removed
-                ? "Student removed from class."
-                : "Unable to remove student.";
+                ? "Đã xóa học sinh khỏi lớp."
+                : "Không thể xóa học sinh khỏi lớp.";
 
             return RedirectToAction(nameof(Students), new { id = classId });
         }

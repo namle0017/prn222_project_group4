@@ -19,6 +19,11 @@ namespace FapWeb.Services.Service
 
         public async Task<ScheduleManagementIndexDto> GetIndexAsync(Guid? classId, DateOnly? dateFilter, Guid currentUserId, string? roleName)
         {
+            if (!CanManageSchedules(roleName))
+            {
+                return new ScheduleManagementIndexDto();
+            }
+
             var query = _context.Schedules
                 .AsNoTracking()
                 .Include(x => x.Class)
@@ -94,10 +99,16 @@ namespace FapWeb.Services.Service
 
         public async Task<ScheduleFormDto?> GetEditModelAsync(Guid scheduleId, Guid currentUserId, string? roleName)
         {
+            if (!CanManageSchedules(roleName))
+            {
+                return null;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var schedule = await _context.Schedules
                 .AsNoTracking()
                 .Include(x => x.Class)
-                .FirstOrDefaultAsync(x => x.Id == scheduleId && (!AppRoles.IsTeacher(roleName) || x.Class.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == scheduleId && (!restrictToOwnClasses || x.Class.TeacherId == currentUserId));
 
             if (schedule == null)
             {
@@ -118,13 +129,14 @@ namespace FapWeb.Services.Service
 
         public async Task<Guid?> CreateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName)
         {
-            if (request.EndTime <= request.StartTime)
+            if (request.EndTime <= request.StartTime || !CanManageSchedules(roleName))
             {
                 return null;
             }
 
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classExists = await _context.Classes
-                .AnyAsync(x => x.Id == request.ClassId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .AnyAsync(x => x.Id == request.ClassId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (!classExists)
             {
@@ -160,16 +172,27 @@ namespace FapWeb.Services.Service
 
         public async Task<bool> UpdateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName)
         {
-            if (request.Id == null || request.EndTime <= request.StartTime)
+            if (request.Id == null || request.EndTime <= request.StartTime || !CanManageSchedules(roleName))
             {
                 return false;
             }
 
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var entity = await _context.Schedules
                 .Include(x => x.Class)
-                .FirstOrDefaultAsync(x => x.Id == request.Id.Value && (!AppRoles.IsTeacher(roleName) || x.Class.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == request.Id.Value && (!restrictToOwnClasses || x.Class.TeacherId == currentUserId));
 
             if (entity == null)
+            {
+                return false;
+            }
+
+            // Cho phep doi buoi hoc sang lop khac, nhung lop dich cung phai thuoc quyen
+            // cua nguoi dang sua, neu khong TEACHER co the day buoi hoc sang lop nguoi khac.
+            var targetClassAllowed = await _context.Classes
+                .AnyAsync(x => x.Id == request.ClassId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
+
+            if (!targetClassAllowed)
             {
                 return false;
             }
@@ -199,11 +222,17 @@ namespace FapWeb.Services.Service
 
         public async Task<ClassScheduleViewDto?> GetClassScheduleAsync(Guid classId, Guid currentUserId, string? roleName)
         {
+            if (!CanManageSchedules(roleName))
+            {
+                return null;
+            }
+
+            var restrictToOwnClasses = AppRoles.IsTeacher(roleName);
             var classEntity = await _context.Classes
                 .AsNoTracking()
                 .Include(x => x.Teacher)
                 .Include(x => x.Schedules)
-                .FirstOrDefaultAsync(x => x.Id == classId && (!AppRoles.IsTeacher(roleName) || x.TeacherId == currentUserId));
+                .FirstOrDefaultAsync(x => x.Id == classId && (!restrictToOwnClasses || x.TeacherId == currentUserId));
 
             if (classEntity == null)
             {
@@ -232,8 +261,22 @@ namespace FapWeb.Services.Service
             };
         }
 
+        /// <summary>
+        /// Chi ADMIN va TEACHER duoc quan ly thoi khoa bieu. Truoc day dieu kien
+        /// "!IsTeacher(role) || ..." khien STUDENT/PARENT tao va sua duoc lich cua moi lop.
+        /// </summary>
+        private static bool CanManageSchedules(string? roleName)
+        {
+            return AppRoles.IsStaff(roleName);
+        }
+
         private async Task<List<SelectOptionDto>> GetClassOptionsAsync(Guid currentUserId, string? roleName)
         {
+            if (!CanManageSchedules(roleName))
+            {
+                return new List<SelectOptionDto>();
+            }
+
             var query = _context.Classes.AsNoTracking().AsQueryable();
 
             if (AppRoles.IsTeacher(roleName))

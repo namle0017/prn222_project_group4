@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FapWeb.Controllers
 {
+    // Quan ly thoi khoa bieu chi danh cho ADMIN va TEACHER.
+    // Hoc sinh/phu huynh xem lich cua minh qua Dashboard.
+    [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
     public class ScheduleManagementController : Controller
     {
         private readonly IScheduleManagementService _scheduleManagementService;
@@ -64,8 +67,8 @@ namespace FapWeb.Controllers
 
             var scheduleId = await _scheduleManagementService.CreateAsync(request, userId.Value, GetCurrentRoleName());
             TempData[scheduleId.HasValue ? "SuccessMessage" : "ErrorMessage"] = scheduleId.HasValue
-                ? "Schedule created successfully."
-                : "Unable to create schedule. Check duplicate date/time or class access.";
+                ? "Tạo buổi học thành công."
+                : "Không thể tạo buổi học. Vui lòng kiểm tra trùng ngày giờ hoặc quyền với lớp này.";
 
             return scheduleId.HasValue
                 ? RedirectToAction(nameof(ClassSchedule), new { classId = request.ClassId })
@@ -113,8 +116,8 @@ namespace FapWeb.Controllers
 
             var updated = await _scheduleManagementService.UpdateAsync(request, userId.Value, GetCurrentRoleName());
             TempData[updated ? "SuccessMessage" : "ErrorMessage"] = updated
-                ? "Schedule updated successfully."
-                : "Unable to update schedule.";
+                ? "Cập nhật buổi học thành công."
+                : "Không thể cập nhật buổi học.";
 
             return RedirectToAction(nameof(ClassSchedule), new { classId = request.ClassId });
         }
