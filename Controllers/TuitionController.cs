@@ -1,3 +1,4 @@
+using FapWeb.Infrastructure;
 using FapWeb.Models.Dtos.TuitionDtos;
 using FapWeb.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,12 @@ namespace FapWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateFee()
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -54,6 +61,12 @@ namespace FapWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateFee(TuitionFeeCreateDto request)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -86,6 +99,12 @@ namespace FapWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> CreatePayment(Guid tuitionFeeId)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -105,6 +124,12 @@ namespace FapWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePayment(PaymentCreateDto request)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -189,6 +214,12 @@ namespace FapWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendReminder(Guid tuitionFeeId)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -201,6 +232,160 @@ namespace FapWeb.Controllers
                 : "Unable to send tuition reminder.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateOtherFee()
+        {
+            var accessCheck = EnsureStaff();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var model = await _tuitionService.GetCreateOtherFeeModelAsync(userId.Value, GetCurrentRoleName());
+            if (model == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateOtherFee(OtherFeeCreateDto request)
+        {
+            var accessCheck = EnsureStaff();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var refreshed = await _tuitionService.GetCreateOtherFeeModelAsync(userId.Value, GetCurrentRoleName());
+                request.ClassOptions = refreshed?.ClassOptions ?? new();
+                return View(request);
+            }
+
+            var (created, error) = await _tuitionService.CreateOtherFeeAsync(request, userId.Value, GetCurrentRoleName());
+            if (error != null)
+            {
+                TempData["ErrorMessage"] = error;
+            }
+            else
+            {
+                TempData["SuccessMessage"] = AppRoles.IsAdmin(GetCurrentRoleName())
+                    ? $"Đã tạo {created} khoản phí khác cho cả lớp."
+                    : $"Đã tạo {created} khoản phí khác. Đang chờ Admin duyệt.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Approvals()
+        {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
+            var pending = await _tuitionService.GetPendingApprovalsAsync(GetCurrentRoleName());
+            return View(pending);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveFee(Guid tuitionFeeId)
+        {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var ok = await _tuitionService.ApproveFeeAsync(tuitionFeeId, userId.Value, GetCurrentRoleName());
+            TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Đã duyệt khoản phí." : "Không thể duyệt khoản phí.";
+            return RedirectToAction(nameof(Approvals));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectFee(Guid tuitionFeeId)
+        {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var ok = await _tuitionService.RejectFeeAsync(tuitionFeeId, userId.Value, GetCurrentRoleName());
+            TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Đã từ chối khoản phí." : "Không thể từ chối khoản phí.";
+            return RedirectToAction(nameof(Approvals));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PendingCount()
+        {
+            var count = await _tuitionService.CountPendingApprovalsAsync(GetCurrentRoleName());
+            return Json(new { count });
+        }
+
+        private IActionResult? EnsureAdmin()
+        {
+            if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString(UserIdSessionKey)))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            if (!AppRoles.IsAdmin(GetCurrentRoleName()))
+            {
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            return null;
+        }
+
+        private IActionResult? EnsureStaff()
+        {
+            if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString(UserIdSessionKey)))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            if (!AppRoles.IsStaff(GetCurrentRoleName()))
+            {
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            return null;
         }
 
         private Guid? GetCurrentUserId()

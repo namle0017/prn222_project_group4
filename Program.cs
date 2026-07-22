@@ -1,3 +1,4 @@
+using FapWeb.Hubs;
 using FapWeb.Models.Configurations;
 using FapWeb.Models.Data;
 using FapWeb.Services.IServices;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.Configure<SePaySettings>(builder.Configuration.GetSection(SePaySettings.SectionName));
 builder.Services.AddScoped<ISePayService, SePayService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -62,5 +64,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ApprovalHub>("/hubs/approval");
 
 app.Run();

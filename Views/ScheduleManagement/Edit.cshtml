@@ -17,6 +17,13 @@
                 <input asp-for="Id" type="hidden" />
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                @if (Model.RemainingEditsThisMonth.HasValue)
+                {
+                    <div class="alert @(Model.RemainingEditsThisMonth.Value == 0 ? "alert-danger" : "alert-info") small">
+                        Còn <strong>@Model.RemainingEditsThisMonth</strong> lần đổi lịch trong tháng này (tối đa 3 lần/buổi).
+                    </div>
+                }
+
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label asp-for="ClassId" class="form-label">Class</label>

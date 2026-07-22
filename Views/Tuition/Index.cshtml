@@ -6,13 +6,29 @@
     var paid = items.Count(x => x.StatusName == "PAID");
     var partial = items.Count(x => x.StatusName == "PARTIAL");
     var unpaid = items.Count(x => x.StatusName == "UNPAID");
+
+    var roleName = Context.Session.GetString(AppSessionKeys.RoleName);
+    var isAdmin = AppRoles.IsAdmin(roleName);
+    var isTeacher = AppRoles.IsTeacher(roleName);
+    var isStaff = AppRoles.IsStaff(roleName);
+    var canPayOnline = !isTeacher; // Admin, Parent, Student
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@ViewData["Title"]</h2>
         <div class="d-flex gap-2">
-            <a asp-controller="Tuition" asp-action="CreateFee" class="btn btn-primary">+ Create Fee</a>
+            @if (isAdmin)
+            {
+                <a asp-controller="Tuition" asp-action="CreateFee" class="btn btn-primary">+ Create Fee</a>
+                <a asp-controller="Tuition" asp-action="Approvals" class="btn btn-outline-warning">
+                    Approvals <span class="badge bg-danger js-pending-badge" style="display:none;">0</span>
+                </a>
+            }
+            @if (isStaff)
+            {
+                <a asp-controller="Tuition" asp-action="CreateOtherFee" class="btn btn-outline-primary">+ Create Other Fee</a>
+            }
             <a asp-controller="Tuition" asp-action="History" class="btn btn-outline-secondary">Payment History</a>
         </div>
     </div>
@@ -54,6 +70,7 @@
                     <tr>
                         <th>Student</th>
                         <th>Class</th>
+                        <th>Nội dung</th>
                         <th>Required Fee</th>
                         <th>Paid</th>
                         <th>Remaining</th>
@@ -68,6 +85,13 @@
                         <tr>
                             <td>@item.StudentName</td>
                             <td>@(string.IsNullOrWhiteSpace(item.ClassName) ? "N/A" : item.ClassName)</td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.Description) ? "N/A" : item.Description)
+                                @if (item.FeeType == "OTHER")
+                                {
+                                    <span class="badge bg-info text-dark ms-1">Phí khác</span>
+                                }
+                            </td>
                             <td>@item.RequiredFee.ToString("N0") VND</td>
                             <td>@item.PaidAmount.ToString("N0") VND</td>
                             <td>@item.RemainingAmount.ToString("N0") VND</td>
@@ -79,17 +103,23 @@
                             <td>@(item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
                             <td class="text-end">
                                 <div class="d-flex gap-2 justify-content-end flex-wrap">
-                                    <form asp-action="PayOnline" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
-                                        <button type="submit" class="btn btn-sm btn-success" @(item.RemainingAmount <= 0 ? "disabled" : null)>Pay Online</button>
-                                    </form>
-                                    <a asp-action="CreatePayment" asp-route-tuitionFeeId="@item.TuitionFeeId" class="btn btn-sm btn-primary">Record Payment</a>
-                                    <form asp-action="SendReminder" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" @(item.RemainingAmount <= 0 ? "disabled" : null)>Send Reminder</button>
-                                    </form>
+                                    @if (canPayOnline)
+                                    {
+                                        <form asp-action="PayOnline" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
+                                            <button type="submit" class="btn btn-sm btn-success" @(item.RemainingAmount <= 0 ? "disabled" : null)>Pay Online</button>
+                                        </form>
+                                    }
+                                    @if (isAdmin)
+                                    {
+                                        <a asp-action="CreatePayment" asp-route-tuitionFeeId="@item.TuitionFeeId" class="btn btn-sm btn-primary">Record Payment</a>
+                                        <form asp-action="SendReminder" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" @(item.RemainingAmount <= 0 ? "disabled" : null)>Send Reminder</button>
+                                        </form>
+                                    }
                                 </div>
                             </td>
                         </tr>

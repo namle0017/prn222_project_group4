@@ -104,6 +104,15 @@ namespace FapWeb.Services.Service
                 return null;
             }
 
+            int? remainingEdits = null;
+            if (AppRoles.IsTeacher(roleName))
+            {
+                var today = DateOnly.FromDateTime(DateTime.Today);
+                var monthStart = new DateOnly(today.Year, today.Month, 1);
+                var usedThisMonth = schedule.EditCountMonth == monthStart ? schedule.EditCount : 0;
+                remainingEdits = Math.Max(0, MaxScheduleEditsPerMonth - usedThisMonth);
+            }
+
             return new ScheduleFormDto
             {
                 Id = schedule.Id,
@@ -112,7 +121,8 @@ namespace FapWeb.Services.Service
                 StartTime = schedule.StartTime,
                 EndTime = schedule.EndTime,
                 Topic = schedule.Topic,
-                ClassOptions = await GetClassOptionsAsync(currentUserId, roleName)
+                ClassOptions = await GetClassOptionsAsync(currentUserId, roleName),
+                RemainingEditsThisMonth = remainingEdits
             };
         }
 
@@ -158,11 +168,14 @@ namespace FapWeb.Services.Service
             return entity.Id;
         }
 
-        public async Task<bool> UpdateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName)
+        // Teacher chỉ được sửa mỗi buổi lịch tối đa 3 lần trong 1 tháng. Admin không giới hạn.
+        private const int MaxScheduleEditsPerMonth = 3;
+
+        public async Task<(bool Ok, string? Error)> UpdateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName)
         {
             if (request.Id == null || request.EndTime <= request.StartTime)
             {
-                return false;
+                return (false, "Thời gian không hợp lệ.");
             }
 
             var entity = await _context.Schedules
@@ -171,7 +184,7 @@ namespace FapWeb.Services.Service
 
             if (entity == null)
             {
-                return false;
+                return (false, "Không tìm thấy lịch hoặc bạn không có quyền với lịch này.");
             }
 
             var duplicateExists = await _context.Schedules.AnyAsync(x =>
@@ -183,7 +196,26 @@ namespace FapWeb.Services.Service
 
             if (duplicateExists)
             {
-                return false;
+                return (false, "Đã tồn tại buổi học trùng ngày/giờ.");
+            }
+
+            if (AppRoles.IsTeacher(roleName))
+            {
+                var today = DateOnly.FromDateTime(DateTime.Today);
+                var monthStart = new DateOnly(today.Year, today.Month, 1);
+
+                if (entity.EditCountMonth != monthStart)
+                {
+                    entity.EditCount = 0;
+                    entity.EditCountMonth = monthStart;
+                }
+
+                if (entity.EditCount >= MaxScheduleEditsPerMonth)
+                {
+                    return (false, $"Đã đổi lịch {MaxScheduleEditsPerMonth} lần trong tháng này. Không thể đổi thêm.");
+                }
+
+                entity.EditCount++;
             }
 
             entity.ClassId = request.ClassId;
@@ -194,7 +226,7 @@ namespace FapWeb.Services.Service
             entity.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            return true;
+            return (true, null);
         }
 
         public async Task<ClassScheduleViewDto?> GetClassScheduleAsync(Guid classId, Guid currentUserId, string? roleName)

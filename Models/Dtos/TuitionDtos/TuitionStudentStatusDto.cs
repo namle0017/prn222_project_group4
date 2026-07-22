@@ -10,6 +10,10 @@ namespace FapWeb.Models.Dtos.TuitionDtos
 
         public string? ClassName { get; set; }
 
+        public string? Description { get; set; }
+
+        public string FeeType { get; set; } = "TUITION";
+
         public decimal RequiredFee { get; set; }
 
         public decimal PaidAmount { get; set; }

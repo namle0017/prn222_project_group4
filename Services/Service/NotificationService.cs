@@ -122,6 +122,21 @@ namespace FapWeb.Services.Service
             await _context.SaveChangesAsync();
         }
 
+        public async Task CreateSimpleNotificationAsync(Guid senderId, Guid receiverId, string title, string content)
+        {
+            await _context.Notifications.AddAsync(new Notification
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Title = title,
+                Content = content,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task CreateTuitionReminderNotificationAsync(Guid teacherId, Guid studentId, decimal? amount, DateTime? dueDate)
         {
             var guardians = await _context.StudentGuardians

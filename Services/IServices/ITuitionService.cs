@@ -22,5 +22,17 @@ namespace FapWeb.Services.IServices
         Task<SePayCheckoutFormDto?> CreateOnlinePaymentAsync(Guid tuitionFeeId, Guid currentUserId, string? roleName, string baseCallbackUrl);
 
         Task<bool> FinalizeOnlinePaymentAsync(string invoiceNumber, string statusName);
+
+        Task<OtherFeeCreateDto?> GetCreateOtherFeeModelAsync(Guid currentUserId, string? roleName);
+
+        Task<(int Created, string? Error)> CreateOtherFeeAsync(OtherFeeCreateDto request, Guid currentUserId, string? roleName);
+
+        Task<List<PendingFeeApprovalDto>> GetPendingApprovalsAsync(string? roleName);
+
+        Task<int> CountPendingApprovalsAsync(string? roleName);
+
+        Task<bool> ApproveFeeAsync(Guid tuitionFeeId, Guid adminId, string? roleName);
+
+        Task<bool> RejectFeeAsync(Guid tuitionFeeId, Guid adminId, string? roleName);
     }
 }

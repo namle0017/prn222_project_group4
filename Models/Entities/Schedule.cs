@@ -17,6 +17,10 @@ public partial class Schedule
 
     public string? Topic { get; set; }
 
+    public int EditCount { get; set; }
+
+    public DateOnly? EditCountMonth { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

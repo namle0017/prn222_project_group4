@@ -2,13 +2,17 @@
 
 @{
     ViewData["Title"] = "Class Students";
+    var isAdmin = AppRoles.IsAdmin(Context.Session.GetString(AppSessionKeys.RoleName));
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">@Model.ClassName - Students</h2>
         <div class="d-flex gap-2">
-            <a asp-action="AddStudent" asp-route-classId="@Model.ClassId" class="btn btn-primary">Add Student</a>
+            @if (isAdmin)
+            {
+                <a asp-action="AddStudent" asp-route-classId="@Model.ClassId" class="btn btn-primary">Add Student</a>
+            }
             <a asp-action="Details" asp-route-id="@Model.ClassId" class="btn btn-outline-secondary">Back</a>
         </div>
     </div>
@@ -37,7 +41,10 @@
                         <th>Guardian</th>
                         <th>Enrolled At</th>
                         <th>Status</th>
-                        <th></th>
+                        @if (isAdmin)
+                        {
+                            <th></th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -48,14 +55,17 @@
                             <td>@(string.IsNullOrWhiteSpace(student.GuardianName) ? "N/A" : student.GuardianName)</td>
                             <td>@(student.EnrolledAt.HasValue ? student.EnrolledAt.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
                             <td><span class="badge @(student.IsActive ? "bg-success" : "bg-secondary")">@(student.IsActive ? "Active" : "Inactive")</span></td>
-                            <td class="text-end">
-                                <form asp-action="RemoveStudent" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="classId" value="@Model.ClassId" />
-                                    <input type="hidden" name="studentId" value="@student.StudentId" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                </form>
-                            </td>
+                            @if (isAdmin)
+                            {
+                                <td class="text-end">
+                                    <form asp-action="RemoveStudent" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="classId" value="@Model.ClassId" />
+                                        <input type="hidden" name="studentId" value="@student.StudentId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                    </form>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>

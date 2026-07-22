@@ -24,5 +24,8 @@ namespace FapWeb.Models.Dtos.ScheduleManagementDtos
         public string? Topic { get; set; }
 
         public List<SelectOptionDto> ClassOptions { get; set; } = new();
+
+        // Số lần còn được đổi lịch trong tháng này (chỉ áp dụng cho teacher). null = không giới hạn.
+        public int? RemainingEditsThisMonth { get; set; }
     }
 }

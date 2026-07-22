@@ -253,6 +253,10 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
+            entity.Property(e => e.EditCount)
+                .HasDefaultValue(0)
+                .HasColumnName("edit_count");
+            entity.Property(e => e.EditCountMonth).HasColumnName("edit_count_month");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
             entity.Property(e => e.ScheduleDate).HasColumnName("schedule_date");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
@@ -368,10 +372,22 @@ public partial class PostgresContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
             entity.Property(e => e.ClassId).HasColumnName("class_id");
+            entity.Property(e => e.ApprovalStatus)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("'APPROVED'::character varying")
+                .HasColumnName("approval_status");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.DueDate).HasColumnName("due_date");
+            entity.Property(e => e.FeeType)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("'TUITION'::character varying")
+                .HasColumnName("fee_type");
             entity.Property(e => e.PaidAmount)
                 .HasPrecision(12, 2)
                 .HasDefaultValueSql("0")
@@ -395,6 +411,10 @@ public partial class PostgresContext : DbContext
                 .HasForeignKey(d => d.StudentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("tuition_fee_student_id_fkey");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("tuition_fee_created_by_fkey");
         });
 
         modelBuilder.Entity<TuitionFeeStatus>(entity =>

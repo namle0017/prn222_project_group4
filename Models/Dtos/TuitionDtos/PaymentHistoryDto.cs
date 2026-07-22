@@ -8,6 +8,8 @@ namespace FapWeb.Models.Dtos.TuitionDtos
 
         public string StudentName { get; set; } = string.Empty;
 
+        public string? Description { get; set; }
+
         public decimal Amount { get; set; }
 
         public DateTime PaymentDate { get; set; }

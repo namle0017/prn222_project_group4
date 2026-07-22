@@ -20,6 +20,8 @@ namespace FapWeb.Models.Dtos.DashboardDtos
 
         public int StudentsWithUnpaidTuition { get; set; }
 
+        public int PendingFeeApprovals { get; set; }
+
         public double OverallAttendanceRate { get; set; }
 
         public List<DashboardNotificationItemDto> LatestNotifications { get; set; } = new();

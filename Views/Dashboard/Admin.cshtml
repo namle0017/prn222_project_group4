@@ -29,6 +29,10 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item px-0">Active schedules: @Model.TotalActiveSchedules</li>
                         <li class="list-group-item px-0">Students with unpaid tuition: @Model.StudentsWithUnpaidTuition</li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span>Phí khác chờ duyệt</span>
+                            <a asp-controller="Tuition" asp-action="Approvals" class="badge bg-danger text-decoration-none js-pending-badge" style="@(Model.PendingFeeApprovals > 0 ? "" : "display:none;")">@Model.PendingFeeApprovals</a>
+                        </li>
                     </ul>
                 </div>
             </div>

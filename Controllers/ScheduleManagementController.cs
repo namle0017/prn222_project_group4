@@ -111,10 +111,10 @@ namespace FapWeb.Controllers
                 return View(request);
             }
 
-            var updated = await _scheduleManagementService.UpdateAsync(request, userId.Value, GetCurrentRoleName());
+            var (updated, error) = await _scheduleManagementService.UpdateAsync(request, userId.Value, GetCurrentRoleName());
             TempData[updated ? "SuccessMessage" : "ErrorMessage"] = updated
                 ? "Schedule updated successfully."
-                : "Unable to update schedule.";
+                : error ?? "Unable to update schedule.";
 
             return RedirectToAction(nameof(ClassSchedule), new { classId = request.ClassId });
         }

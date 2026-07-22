@@ -15,5 +15,7 @@ namespace FapWeb.Services.IServices
         Task CreateAbsentAttendanceNotificationAsync(Guid teacherId, Guid studentId, DateTime attendanceDate);
 
         Task CreateTuitionReminderNotificationAsync(Guid teacherId, Guid studentId, decimal? amount, DateTime? dueDate);
+
+        Task CreateSimpleNotificationAsync(Guid senderId, Guid receiverId, string title, string content);
     }
 }
