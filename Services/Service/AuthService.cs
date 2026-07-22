@@ -16,9 +16,11 @@ namespace FapWeb.Services.Service
         }
         public LoginResponseDto? LoginAsync(LoginRequestDto request)
         {
+            // IsActive = null la du lieu cu chua set co, van coi la dang hoat dong.
+            // Tai khoan bi admin tat (IsActive = false) thi khong duoc dang nhap.
             var user = _context.Users
                                                 .Include(u => u.Role)
-                                                .Where(u => u.Phone == request.UserPhoneNumber)
+                                                .Where(u => u.Phone == request.UserPhoneNumber && u.IsActive != false)
                                                 .Select(u => new
                                                 {
                                                     u.Id,
@@ -65,9 +67,30 @@ namespace FapWeb.Services.Service
             return true;
         }
 
+        /// <summary>
+        /// BCrypt.Verify nem SaltParseException neu PasswordHash trong database khong
+        /// dung dinh dang BCrypt (du lieu cu hoac hash duoc chen tay). Truoc day loi nay
+        /// khong duoc bat nen nguoi dung gap trang loi 500 thay vi thong bao sai mat khau.
+        /// </summary>
         private bool VerifyPassword(string password, string hashedPassword)
         {
-            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+            if (string.IsNullOrWhiteSpace(hashedPassword))
+            {
+                return false;
+            }
+
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+            }
+            catch (SaltParseException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
         }
 
         private string HashPassword(string password)
