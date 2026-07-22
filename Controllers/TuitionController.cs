@@ -1,3 +1,4 @@
+using FapWeb.Infrastructure;
 using FapWeb.Models.Dtos.TuitionDtos;
 using FapWeb.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -56,10 +57,17 @@ namespace FapWeb.Controllers
                     "UNPAID" => "Chưa nộp",
                     _ => item.StatusName
                 };
-                builder.AppendLine($"{item.StudentName},{item.ClassName},{item.RequiredFee},{item.PaidAmount},{item.RemainingAmount},{status},{dueDate}");
+                builder.AppendLine(CsvHelper.Row(
+                    item.StudentName,
+                    item.ClassName,
+                    item.RequiredFee.ToString("0"),
+                    item.PaidAmount.ToString("0"),
+                    item.RemainingAmount.ToString("0"),
+                    status,
+                    dueDate));
             }
-            
-            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"QuanLyHocPhi_{DateTime.Now:yyyyMMdd}.csv");
+
+            return File(CsvHelper.ToFileBytes(builder), "text/csv", $"QuanLyHocPhi_{DateTime.Now:yyyyMMdd}.csv");
         }
 
         [HttpGet]
@@ -148,8 +156,8 @@ namespace FapWeb.Controllers
 
             var saved = await _tuitionService.RecordPaymentAsync(request, userId.Value, GetCurrentRoleName());
             TempData[saved ? "SuccessMessage" : "ErrorMessage"] = saved
-                ? "Payment recorded successfully."
-                : "Unable to record payment.";
+                ? "Ghi nhận thanh toán thành công."
+                : "Không thể ghi nhận thanh toán.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -230,8 +238,8 @@ namespace FapWeb.Controllers
 
             var sent = await _tuitionService.SendTuitionReminderAsync(tuitionFeeId, userId.Value, GetCurrentRoleName());
             TempData[sent ? "SuccessMessage" : "ErrorMessage"] = sent
-                ? "Tuition reminder sent successfully."
-                : "Unable to send tuition reminder.";
+                ? "Đã gửi nhắc đóng học phí."
+                : "Không thể gửi nhắc đóng học phí.";
 
             return RedirectToAction(nameof(Index));
         }

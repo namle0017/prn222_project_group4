@@ -63,10 +63,10 @@ namespace FapWeb.Controllers
 
             var saved = await _attendanceService.SaveAttendanceAsync(request, userId.Value, GetCurrentRoleName());
             TempData[saved ? "SuccessMessage" : "ErrorMessage"] = saved
-                ? "Attendance saved successfully."
+                ? "Lưu điểm danh thành công."
                 : request.ScheduleId.HasValue
-                    ? "Unable to save attendance. Please verify the selected schedule and enrolled students."
-                    : "No schedule exists for this class and date. Please create a schedule first.";
+                    ? "Không thể lưu điểm danh. Vui lòng kiểm tra lại buổi học và danh sách học sinh của lớp."
+                    : "Lớp này chưa có buổi học nào trong ngày đã chọn. Vui lòng tạo lịch học trước.";
 
             return RedirectToAction(nameof(Take), new
             {
@@ -107,10 +107,15 @@ namespace FapWeb.Controllers
             {
                 var status = item.StatusName.Equals("ABSENT", StringComparison.OrdinalIgnoreCase) ? "Vắng mặt" : "Có mặt";
                 var teacher = string.IsNullOrWhiteSpace(item.TeacherName) ? "Không có" : item.TeacherName;
-                builder.AppendLine($"{item.AttendanceDate:dd/MM/yyyy},{item.StudentName},{item.ClassName},{status},{teacher}");
+                builder.AppendLine(CsvHelper.Row(
+                    item.AttendanceDate.ToString("dd/MM/yyyy"),
+                    item.StudentName,
+                    item.ClassName,
+                    status,
+                    teacher));
             }
-            
-            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"LichSuDiemDanh_{DateTime.Now:yyyyMMdd}.csv");
+
+            return File(CsvHelper.ToFileBytes(builder), "text/csv", $"LichSuDiemDanh_{DateTime.Now:yyyyMMdd}.csv");
         }
 
         [HttpGet]
@@ -136,10 +141,10 @@ namespace FapWeb.Controllers
             {
                 var student = model.Students[i];
                 var status = student.StatusName.Equals("ABSENT", StringComparison.OrdinalIgnoreCase) ? "Vắng mặt" : "Có mặt";
-                builder.AppendLine($"{i + 1},{student.StudentName},{status}");
+                builder.AppendLine(CsvHelper.Row((i + 1).ToString(), student.StudentName, status));
             }
-            
-            return File(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(builder.ToString())).ToArray(), "text/csv", $"DiemDanhCaHoc_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+
+            return File(CsvHelper.ToFileBytes(builder), "text/csv", $"DiemDanhCaHoc_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
         }
 
         private Guid? GetCurrentUserId()
