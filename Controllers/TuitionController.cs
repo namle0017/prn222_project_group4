@@ -189,8 +189,11 @@ namespace FapWeb.Controllers
             return View(checkoutForm);
         }
 
+        // SePay chuyen huong ve day sau khi thanh toan. Tham so sig la chu ky do
+        // he thong tu gan vao URL callback luc tao phien thanh toan; thieu hoac
+        // sai chu ky thi giao dich khong duoc ghi nhan.
         [HttpGet]
-        public async Task<IActionResult> PaymentCallback(string invoice, string result)
+        public async Task<IActionResult> PaymentCallback(string invoice, string result, string? sig)
         {
             var statusName = result?.ToLowerInvariant() switch
             {
@@ -199,7 +202,7 @@ namespace FapWeb.Controllers
                 _ => "FAILED"
             };
 
-            var isSuccess = await _tuitionService.FinalizeOnlinePaymentAsync(invoice, statusName);
+            var isSuccess = await _tuitionService.FinalizeOnlinePaymentAsync(invoice, statusName, sig);
 
             if (isSuccess)
             {

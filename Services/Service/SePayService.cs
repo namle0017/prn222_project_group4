@@ -55,6 +55,27 @@ namespace FapWeb.Services.Service
             };
         }
 
+        public string SignInvoice(string invoiceNumber)
+        {
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_settings.SecretKey ?? string.Empty));
+            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes($"invoice={invoiceNumber}"));
+            return Convert.ToHexString(hash).ToLowerInvariant();
+        }
+
+        public bool VerifyInvoiceSignature(string invoiceNumber, string? signature)
+        {
+            if (string.IsNullOrWhiteSpace(invoiceNumber) || string.IsNullOrWhiteSpace(signature))
+            {
+                return false;
+            }
+
+            var expected = Encoding.UTF8.GetBytes(SignInvoice(invoiceNumber));
+            var actual = Encoding.UTF8.GetBytes(signature);
+
+            // So sanh thoi gian co dinh de khong lo thong tin qua thoi gian phan hoi.
+            return CryptographicOperations.FixedTimeEquals(expected, actual);
+        }
+
         private static string SignFields(IEnumerable<KeyValuePair<string, string>> fields, string secretKey)
         {
             var signedString = string.Join(",", fields.Select(f => $"{f.Key}={f.Value}"));

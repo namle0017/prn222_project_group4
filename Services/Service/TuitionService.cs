@@ -333,7 +333,10 @@ namespace FapWeb.Services.Service
             });
             await _context.SaveChangesAsync();
 
-            var callbackUrl = $"{baseCallbackUrl.TrimEnd('/')}/Tuition/PaymentCallback?invoice={invoiceNumber}";
+            // Ky ma hoa don vao URL callback de khi SePay tra ve co the xac minh
+            // callback thuoc phien thanh toan do he thong tao, khong phai URL tu che.
+            var signature = _sePayService.SignInvoice(invoiceNumber);
+            var callbackUrl = $"{baseCallbackUrl.TrimEnd('/')}/Tuition/PaymentCallback?invoice={invoiceNumber}&sig={signature}";
 
             return _sePayService.BuildCheckoutForm(new SePayCheckoutOrderDto
             {
@@ -347,9 +350,17 @@ namespace FapWeb.Services.Service
             });
         }
 
-        public async Task<bool> FinalizeOnlinePaymentAsync(string invoiceNumber, string statusName)
+        public async Task<bool> FinalizeOnlinePaymentAsync(string invoiceNumber, string statusName, string? signature)
         {
             if (string.IsNullOrWhiteSpace(invoiceNumber))
+            {
+                return false;
+            }
+
+            // Khong co chu ky hop le thi khong dung den database. Truoc day endpoint
+            // callback tin hoan toan vao query string nen ai cung co the goi
+            // /Tuition/PaymentCallback?invoice=...&result=success de danh dau da dong tien.
+            if (!_sePayService.VerifyInvoiceSignature(invoiceNumber, signature))
             {
                 return false;
             }

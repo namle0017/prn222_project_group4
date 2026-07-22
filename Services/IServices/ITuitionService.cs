@@ -21,6 +21,6 @@ namespace FapWeb.Services.IServices
 
         Task<SePayCheckoutFormDto?> CreateOnlinePaymentAsync(Guid tuitionFeeId, Guid currentUserId, string? roleName, string baseCallbackUrl);
 
-        Task<bool> FinalizeOnlinePaymentAsync(string invoiceNumber, string statusName);
+        Task<bool> FinalizeOnlinePaymentAsync(string invoiceNumber, string statusName, string? signature);
     }
 }
