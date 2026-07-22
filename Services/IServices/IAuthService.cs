@@ -5,7 +5,7 @@ namespace FapWeb.Services.IServices
 {
     public interface IAuthService
     {
-        LoginResponseDto? LoginAsync(LoginRequestDto request);
-        Task<bool> ChangePassword(ChangePasswordRequestDto request);
+        Task<LoginResponseDto?> LoginAsync(LoginRequestDto request);
+        Task<bool> ChangePasswordAsync(ChangePasswordRequestDto request);
     }
 }

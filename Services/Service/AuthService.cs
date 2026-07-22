@@ -14,11 +14,11 @@ namespace FapWeb.Services.Service
         {
             _context = context;
         }
-        public LoginResponseDto? LoginAsync(LoginRequestDto request)
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
             // IsActive = null la du lieu cu chua set co, van coi la dang hoat dong.
             // Tai khoan bi admin tat (IsActive = false) thi khong duoc dang nhap.
-            var user = _context.Users
+            var user = await _context.Users
                                                 .Include(u => u.Role)
                                                 .Where(u => u.Phone == request.UserPhoneNumber && u.IsActive != false)
                                                 .Select(u => new
@@ -28,7 +28,7 @@ namespace FapWeb.Services.Service
                                                     u.Role.RoleName,
                                                     u.PasswordHash
                                                 })
-                                                .FirstOrDefault();
+                                                .FirstOrDefaultAsync();
             if (user == null)
             {
                 return null;
@@ -48,7 +48,7 @@ namespace FapWeb.Services.Service
             };
         }
 
-        public async Task<bool> ChangePassword(ChangePasswordRequestDto request)
+        public async Task<bool> ChangePasswordAsync(ChangePasswordRequestDto request)
         {
             var user = await _context.Users.FindAsync(request.UserId);
             if (user == null)

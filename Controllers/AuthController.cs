@@ -32,14 +32,14 @@ namespace FapWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(LoginRequestDto request)
+        public async Task<IActionResult> Login(LoginRequestDto request)
         {
             if (!ModelState.IsValid)
             {
                 return View(request);
             }
 
-            var loginResult = _authService.LoginAsync(request);
+            var loginResult = await _authService.LoginAsync(request);
             if (loginResult == null)
             {
                 ModelState.AddModelError(string.Empty, "Số điện thoại hoặc mật khẩu không đúng.");
@@ -91,7 +91,7 @@ namespace FapWeb.Controllers
             }
 
             request.UserId = userId;
-            var changed = await _authService.ChangePassword(request);
+            var changed = await _authService.ChangePasswordAsync(request);
             if (!changed)
             {
                 ModelState.AddModelError(string.Empty, "Mật khẩu hiện tại không đúng.");

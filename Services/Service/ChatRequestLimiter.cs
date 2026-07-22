@@ -62,6 +62,43 @@ namespace FapWeb.Services.Service
             {
                 usage.IsInFlight = false;
             }
+
+            RemoveExpiredSessions();
+        }
+
+        /// <summary>
+        /// ChatRequestLimiter la Singleton nen _sessions se phinh mai neu khong don.
+        /// Moi session sau khi het cua so gioi han va khong con request nao dang chay
+        /// thi khong con gia tri, co the bo di.
+        /// </summary>
+        private void RemoveExpiredSessions()
+        {
+            var windowMinutes = Math.Max(1, _settings.RateLimitWindowMinutes);
+
+            // Chi don session da im lang gap doi cua so gioi han. De han rong nhu vay
+            // de mot session vua duoc GetOrAdd o luong khac khong bi xoa nham,
+            // vi bi xoa nham dong nghia voi viec session do thoat khoi gioi han.
+            var staleBefore = DateTime.UtcNow.AddMinutes(-windowMinutes * 2);
+
+            foreach (var entry in _sessions)
+            {
+                var usage = entry.Value;
+                bool isStale;
+
+                lock (usage.SyncRoot)
+                {
+                    // Khong dung dieu kien Requests rong: mot session vua duoc tao o
+                    // luong khac cung dang rong trong khoanh khac truoc khi ghi request.
+                    isStale = !usage.IsInFlight
+                              && usage.Requests.Count > 0
+                              && usage.Requests.Max() < staleBefore;
+                }
+
+                if (isStale)
+                {
+                    _sessions.TryRemove(entry.Key, out _);
+                }
+            }
         }
     }
 }

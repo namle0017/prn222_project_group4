@@ -105,6 +105,14 @@ namespace FapWeb.Services.Service
                 return false;
             }
 
+            // Khong cho ghi nhan vuot qua so con phai dong, tranh sai lech so lieu
+            // hoc phi da thu khi nhap nham so tien.
+            var amountDue = tuitionFee.TotalAmount - (tuitionFee.PaidAmount ?? 0);
+            if (request.Amount > amountDue)
+            {
+                return false;
+            }
+
             tuitionFee.PaidAmount = (tuitionFee.PaidAmount ?? 0) + request.Amount;
             tuitionFee.UpdatedAt = DateTime.UtcNow;
 
