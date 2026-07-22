@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FapWeb.Controllers
 {
+    // Quan ly thoi khoa bieu chi danh cho ADMIN va TEACHER.
+    // Hoc sinh/phu huynh xem lich cua minh qua Dashboard.
+    [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
     public class ScheduleManagementController : Controller
     {
         private readonly IScheduleManagementService _scheduleManagementService;
