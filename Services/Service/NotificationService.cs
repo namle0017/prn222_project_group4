@@ -6,15 +6,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FapWeb.Services.Service
 {
+    /// <summary>
+    /// Dịch vụ nghiệp vụ Quản lý và Phát Thông báo Hệ thống (Notification Service Implementation).
+    /// </summary>
+    /// <remarks>
+    /// Chịu trách nhiệm truy vấn hòm thư thông báo của người dùng, tạo thông báo tự động khi học sinh vắng mặt
+    /// và cập nhật trạng thái đã đọc cho các bản ghi thông báo.
+    /// </remarks>
     public class NotificationService : INotificationService
     {
         private readonly PostgresContext _context;
 
+        /// <summary>
+        /// Khởi tạo NotificationService với PostgresContext được tiêm qua Dependency Injection.
+        /// </summary>
+        /// <param name="context">Đối tượng PostgresContext quản lý kết nối CSDL.</param>
         public NotificationService(PostgresContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Lấy danh sách toàn bộ thông báo đã nhận của người dùng theo mã định danh receiverId.
+        /// </summary>
+        /// <param name="receiverId">Mã định danh duy nhất (Guid) của người nhận thông báo.</param>
+        /// <returns>Trả về danh sách NotificationResponseDto sắp xếp giảm dần theo thời gian tạo.</returns>
         public async Task<List<NotificationResponseDto>> GetReceivedNotificationsAsync(Guid receiverId)
         {
             return await _context.Notifications

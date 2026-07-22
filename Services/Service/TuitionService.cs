@@ -7,6 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FapWeb.Services.Service
 {
+    /// <summary>
+    /// Dịch vụ nghiệp vụ Quản lý Học phí và Xử lý Thanh toán (Tuition Service Implementation).
+    /// </summary>
+    /// <remarks>
+    /// Quản lý danh sách hóa đơn học phí của sinh viên, xử lý khớp dữ liệu chuyển khoản tự động
+    /// từ ngân hàng qua SePay Webhook và cập nhật trạng thái hóa đơn.
+    /// </remarks>
     public class TuitionService : ITuitionService
     {
         private const string TransactionStatusPending = "PENDING";
@@ -16,6 +23,12 @@ namespace FapWeb.Services.Service
         private readonly INotificationService _notificationService;
         private readonly ISePayService _sePayService;
 
+        /// <summary>
+        /// Khởi tạo TuitionService với PostgresContext, INotificationService và ISePayService.
+        /// </summary>
+        /// <param name="context">Đối tượng PostgresContext quản lý kết nối CSDL.</param>
+        /// <param name="notificationService">Dịch vụ gửi thông báo học phí.</param>
+        /// <param name="sePayService">Dịch vụ tích hợp SePay Webhook.</param>
         public TuitionService(PostgresContext context, INotificationService notificationService, ISePayService sePayService)
         {
             _context = context;
@@ -23,6 +36,12 @@ namespace FapWeb.Services.Service
             _sePayService = sePayService;
         }
 
+        /// <summary>
+        /// Truy vấn danh sách trạng thái nộp học phí của sinh viên theo ID người dùng và tên vai trò phân quyền.
+        /// </summary>
+        /// <param name="currentUserId">Mã người dùng yêu cầu tra cứu.</param>
+        /// <param name="roleName">Tên vai trò phân quyền (TEACHER, STUDENT, PARENT, ADMIN).</param>
+        /// <returns>Danh sách TuitionStudentStatusDto biểu diễn thông tin chi tiết học phí.</returns>
         public async Task<List<TuitionStudentStatusDto>> GetTuitionStatusesAsync(Guid currentUserId, string? roleName)
         {
             var query = _context.TuitionFees

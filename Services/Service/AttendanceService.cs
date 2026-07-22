@@ -8,17 +8,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FapWeb.Services.Service
 {
+    /// <summary>
+    /// Dịch vụ nghiệp vụ Quản lý Điểm danh và Theo dõi Chuyên cần (Attendance Service Implementation).
+    /// </summary>
+    /// <remarks>
+    /// Chịu trách nhiệm thực thi toàn bộ các câu lệnh LINQ tương tác với PostgresContext
+    /// để quản lý danh sách lớp học, ca học điểm danh, nhật ký vắng học và tự động phát thông báo.
+    /// </remarks>
     public class AttendanceService : IAttendanceService
     {
         private readonly PostgresContext _context;
         private readonly INotificationService _notificationService;
 
+        /// <summary>
+        /// Khởi tạo đối tượng AttendanceService với PostgresContext và INotificationService được tiêm qua Dependency Injection.
+        /// </summary>
+        /// <param name="context">Đối tượng PostgresContext quản lý kết nối CSDL.</param>
+        /// <param name="notificationService">Dịch vụ gửi thông báo tự động.</param>
         public AttendanceService(PostgresContext context, INotificationService notificationService)
         {
             _context = context;
             _notificationService = notificationService;
         }
 
+        /// <summary>
+        /// Truy vấn danh sách các lớp học khả dụng theo ID người dùng và tên vai trò phân quyền.
+        /// </summary>
+        /// <param name="currentUserId">Mã người dùng thực hiện truy vấn.</param>
+        /// <param name="roleName">Tên vai trò phân quyền (TEACHER, ADMIN, STUDENT, PARENT).</param>
+        /// <returns>Trả về danh sách các lớp học dạng List&lt;AttendanceClassDto&gt;.</returns>
         public async Task<List<AttendanceClassDto>> GetAttendanceClassesAsync(Guid currentUserId, string? roleName)
         {
             var query = _context.Classes

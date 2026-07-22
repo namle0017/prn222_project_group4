@@ -5,15 +5,30 @@ using FapWeb.Infrastructure;
 
 namespace FapWeb.Controllers
 {
+    /// <summary>
+    /// Bộ điều khiển Quản lý Điểm danh và Tra cứu Lịch sử Chuyên cần (Attendance Controller).
+    /// </summary>
+    /// <remarks>
+    /// Đảm nhận điều hướng các trang hiển thị danh sách lớp học điểm danh, form tích chọn trạng thái có mặt/vắng mặt,
+    /// xuất dữ liệu ra file Excel và hiển thị giao diện báo cáo chuyên cần.
+    /// </remarks>
     public class AttendanceController : Controller
     {
         private readonly IAttendanceService _attendanceService;
 
+        /// <summary>
+        /// Khởi tạo AttendanceController với IAttendanceService được tiêm qua Dependency Injection.
+        /// </summary>
+        /// <param name="attendanceService">Dịch vụ quản lý điểm danh.</param>
         public AttendanceController(IAttendanceService attendanceService)
         {
             _attendanceService = attendanceService;
         }
 
+        /// <summary>
+        /// Action hiển thị trang danh sách các lớp học cần điểm danh (Index View).
+        /// </summary>
+        /// <returns>Trả về View danh sách lớp học hoặc chuyển hướng về trang Đăng nhập nếu chưa xác thực.</returns>
         [HttpGet]
         public async Task<IActionResult> Index()
         {
