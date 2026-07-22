@@ -103,6 +103,11 @@
                     <span class="dli-label">Học sinh chưa nộp học phí</span>
                     <span class="dli-value" style="color:var(--color-pink);">@Model.StudentsWithUnpaidTuition</span>
                 </li>
+                <li class="dashboard-list-item">
+                    <span class="dli-icon" style="color:var(--color-violet);"><i class="bi bi-hourglass-split"></i></span>
+                    <span class="dli-label">Phí khác chờ duyệt</span>
+                    <a asp-controller="Tuition" asp-action="Approvals" class="dli-value badge bg-danger text-decoration-none js-pending-badge" style="@(Model.PendingFeeApprovals > 0 ? "" : "display:none;")">@Model.PendingFeeApprovals</a>
+                </li>
             </ul>
         </div>
     </div>

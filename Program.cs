@@ -1,3 +1,4 @@
+using FapWeb.Hubs;
 using FapWeb.Models.Configurations;
 using FapWeb.Models.Data;
 using FapWeb.Infrastructure;
@@ -55,6 +56,7 @@ builder.Services.AddScoped<DemoDataSeeder>();
 builder.Services.Configure<MiMoSettings>(builder.Configuration.GetSection(MiMoSettings.SectionName));
 builder.Services.AddSingleton<IChatRequestLimiter, ChatRequestLimiter>();
 builder.Services.AddHttpClient<IChatbotService, ChatbotService>();
+builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -104,5 +106,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ApprovalHub>("/hubs/approval");
 
 app.Run();

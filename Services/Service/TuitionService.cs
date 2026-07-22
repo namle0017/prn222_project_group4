@@ -1,8 +1,11 @@
+using FapWeb.Hubs;
+using FapWeb.Infrastructure;
 using FapWeb.Models.Data;
 using FapWeb.Models.Dtos.SePayDtos;
 using FapWeb.Models.Dtos.TuitionDtos;
 using FapWeb.Models.Entities;
 using FapWeb.Services.IServices;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace FapWeb.Services.Service
@@ -12,15 +15,23 @@ namespace FapWeb.Services.Service
         private const string TransactionStatusPending = "PENDING";
         private const string TransactionStatusSuccess = "SUCCESS";
 
+        private const string FeeTypeTuition = "TUITION";
+        private const string FeeTypeOther = "OTHER";
+        private const string ApprovalPending = "PENDING";
+        private const string ApprovalApproved = "APPROVED";
+        private const string ApprovalRejected = "REJECTED";
+
         private readonly PostgresContext _context;
         private readonly INotificationService _notificationService;
         private readonly ISePayService _sePayService;
+        private readonly IHubContext<ApprovalHub> _approvalHub;
 
-        public TuitionService(PostgresContext context, INotificationService notificationService, ISePayService sePayService)
+        public TuitionService(PostgresContext context, INotificationService notificationService, ISePayService sePayService, IHubContext<ApprovalHub> approvalHub)
         {
             _context = context;
             _notificationService = notificationService;
             _sePayService = sePayService;
+            _approvalHub = approvalHub;
         }
 
         public async Task<List<TuitionStudentStatusDto>> GetTuitionStatusesAsync(Guid currentUserId, string? roleName)
@@ -44,6 +55,9 @@ namespace FapWeb.Services.Service
                 query = query.Where(x => x.Student.StudentGuardianStudents.Any(sg => sg.GuardianId == currentUserId));
             }
 
+            // Phí "khác" đang chờ duyệt chỉ hiện ở trang Approvals; bảng học phí chỉ hiện phí đã duyệt.
+            query = query.Where(x => x.ApprovalStatus == ApprovalApproved);
+
             return await query
                 .OrderBy(x => x.Student.FullName)
                 .Select(x => new TuitionStudentStatusDto
@@ -52,6 +66,8 @@ namespace FapWeb.Services.Service
                     StudentId = x.StudentId,
                     StudentName = x.Student.FullName,
                     ClassName = x.Class != null ? x.Class.ClassName : null,
+                    Description = x.Description,
+                    FeeType = x.FeeType,
                     RequiredFee = x.TotalAmount,
                     PaidAmount = x.PaidAmount ?? 0,
                     RemainingAmount = x.TotalAmount - (x.PaidAmount ?? 0),
@@ -63,7 +79,8 @@ namespace FapWeb.Services.Service
 
         public async Task<PaymentCreateDto?> GetPaymentCreateAsync(Guid tuitionFeeId, Guid currentUserId, string? roleName)
         {
-            if (!CanManageTuition(roleName))
+            // Thu tiền thủ công chỉ dành cho Admin.
+            if (!IsAdmin(roleName))
             {
                 return null;
             }
@@ -72,7 +89,7 @@ namespace FapWeb.Services.Service
                 .AsNoTracking()
                 .Include(x => x.Student)
                 .Include(x => x.Class)
-                .FirstOrDefaultAsync(x => x.Id == tuitionFeeId && (!IsTeacher(roleName) || (x.Class != null && x.Class.TeacherId == currentUserId)));
+                .FirstOrDefaultAsync(x => x.Id == tuitionFeeId && x.ApprovalStatus == ApprovalApproved);
 
             if (tuitionFee == null)
             {
@@ -84,6 +101,7 @@ namespace FapWeb.Services.Service
                 TuitionFeeId = tuitionFee.Id,
                 StudentId = tuitionFee.StudentId,
                 StudentName = tuitionFee.Student.FullName,
+                Description = tuitionFee.Description,
                 RemainingAmount = Math.Max(0, tuitionFee.TotalAmount - (tuitionFee.PaidAmount ?? 0)),
                 PaymentDate = DateTime.Today
             };
@@ -91,14 +109,14 @@ namespace FapWeb.Services.Service
 
         public async Task<bool> RecordPaymentAsync(PaymentCreateDto request, Guid receiverId, string? roleName)
         {
-            if (!CanManageTuition(roleName) || request.Amount <= 0)
+            if (!IsAdmin(roleName) || request.Amount <= 0)
             {
                 return false;
             }
 
             var tuitionFee = await _context.TuitionFees
                 .Include(x => x.Class)
-                .FirstOrDefaultAsync(x => x.Id == request.TuitionFeeId && (!IsTeacher(roleName) || (x.Class != null && x.Class.TeacherId == receiverId)));
+                .FirstOrDefaultAsync(x => x.Id == request.TuitionFeeId && x.ApprovalStatus == ApprovalApproved);
 
             if (tuitionFee == null)
             {
@@ -171,6 +189,7 @@ namespace FapWeb.Services.Service
                     TransactionId = x.Id,
                     StudentId = x.TuitionFee.StudentId,
                     StudentName = x.TuitionFee.Student.FullName,
+                    Description = x.TuitionFee.Description,
                     Amount = x.Amount,
                     PaymentDate = x.CreatedAt,
                     RecordedByName = x.PaidByNavigation != null ? x.PaidByNavigation.FullName : "N/A",
@@ -290,6 +309,10 @@ namespace FapWeb.Services.Service
                     PaidAmount = 0,
                     DueDate = monthEnd,
                     StatusId = tuitionStatusIds["UNPAID"],
+                    Description = $"Học phí tháng {request.BillingMonth}",
+                    FeeType = FeeTypeTuition,
+                    ApprovalStatus = ApprovalApproved,
+                    CreatedBy = currentUserId,
                     CreatedAt = now,
                     UpdatedAt = now
                 });
@@ -306,7 +329,9 @@ namespace FapWeb.Services.Service
                 .Include(x => x.Class)
                 .FirstOrDefaultAsync(x => x.Id == tuitionFeeId);
 
-            if (tuitionFee == null || !await CanAccessTuitionFeeAsync(tuitionFee, currentUserId, roleName))
+            if (tuitionFee == null
+                || tuitionFee.ApprovalStatus != ApprovalApproved
+                || !await CanAccessTuitionFeeAsync(tuitionFee, currentUserId, roleName))
             {
                 return null;
             }
@@ -389,16 +414,216 @@ namespace FapWeb.Services.Service
             return isSuccess;
         }
 
+        public async Task<OtherFeeCreateDto?> GetCreateOtherFeeModelAsync(Guid currentUserId, string? roleName)
+        {
+            if (!IsStaff(roleName))
+            {
+                return null;
+            }
+
+            return new OtherFeeCreateDto
+            {
+                ClassOptions = await _context.Classes
+                    .AsNoTracking()
+                    .Where(x => !IsTeacher(roleName) || x.TeacherId == currentUserId)
+                    .OrderBy(x => x.ClassName)
+                    .Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(x.ClassName, x.Id.ToString()))
+                    .ToListAsync()
+            };
+        }
+
+        public async Task<(int Created, string? Error)> CreateOtherFeeAsync(OtherFeeCreateDto request, Guid currentUserId, string? roleName)
+        {
+            if (!IsStaff(roleName) || request.Amount <= 0 || !request.ClassId.HasValue || string.IsNullOrWhiteSpace(request.Description))
+            {
+                return (0, "Yêu cầu không hợp lệ.");
+            }
+
+            var classEntity = await _context.Classes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == request.ClassId.Value && (!IsTeacher(roleName) || x.TeacherId == currentUserId));
+            if (classEntity == null)
+            {
+                return (0, "Lớp học không hợp lệ hoặc bạn không có quyền với lớp này.");
+            }
+
+            var studentIds = await _context.ClassStudents
+                .AsNoTracking()
+                .Where(x => x.ClassId == request.ClassId.Value && x.IsEnable != false)
+                .Select(x => x.StudentId)
+                .Distinct()
+                .ToListAsync();
+
+            if (studentIds.Count == 0)
+            {
+                return (0, "Lớp này chưa có học sinh nào.");
+            }
+
+            // Teacher tạo -> chờ duyệt; Admin tạo -> duyệt luôn.
+            var approvalStatus = IsAdmin(roleName) ? ApprovalApproved : ApprovalPending;
+            var tuitionStatusIds = await EnsureTuitionStatusesAsync();
+            var now = DateTime.UtcNow;
+            var description = request.Description.Trim();
+
+            foreach (var studentId in studentIds)
+            {
+                await _context.TuitionFees.AddAsync(new TuitionFee
+                {
+                    Id = Guid.NewGuid(),
+                    StudentId = studentId,
+                    ClassId = request.ClassId,
+                    TotalAmount = request.Amount,
+                    PaidAmount = 0,
+                    DueDate = request.DueDate,
+                    StatusId = tuitionStatusIds["UNPAID"],
+                    Description = description,
+                    FeeType = FeeTypeOther,
+                    ApprovalStatus = approvalStatus,
+                    CreatedBy = currentUserId,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (approvalStatus == ApprovalPending)
+            {
+                await NotifyAdminsPendingFeeAsync(currentUserId, classEntity.ClassName, description, request.Amount, studentIds.Count);
+            }
+
+            return (studentIds.Count, null);
+        }
+
+        public async Task<List<PendingFeeApprovalDto>> GetPendingApprovalsAsync(string? roleName)
+        {
+            if (!IsAdmin(roleName))
+            {
+                return new List<PendingFeeApprovalDto>();
+            }
+
+            return await _context.TuitionFees
+                .AsNoTracking()
+                .Include(x => x.Student)
+                .Include(x => x.Class)
+                .Include(x => x.CreatedByNavigation)
+                .Where(x => x.ApprovalStatus == ApprovalPending)
+                .OrderBy(x => x.CreatedAt)
+                .Select(x => new PendingFeeApprovalDto
+                {
+                    TuitionFeeId = x.Id,
+                    StudentName = x.Student.FullName,
+                    ClassName = x.Class != null ? x.Class.ClassName : null,
+                    Description = x.Description,
+                    Amount = x.TotalAmount,
+                    DueDate = x.DueDate,
+                    CreatedByName = x.CreatedByNavigation != null ? x.CreatedByNavigation.FullName : null,
+                    CreatedAt = x.CreatedAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int> CountPendingApprovalsAsync(string? roleName)
+        {
+            if (!IsAdmin(roleName))
+            {
+                return 0;
+            }
+
+            return await _context.TuitionFees.CountAsync(x => x.ApprovalStatus == ApprovalPending);
+        }
+
+        public async Task<bool> ApproveFeeAsync(Guid tuitionFeeId, Guid adminId, string? roleName)
+        {
+            return await ReviewFeeAsync(tuitionFeeId, adminId, roleName, approve: true);
+        }
+
+        public async Task<bool> RejectFeeAsync(Guid tuitionFeeId, Guid adminId, string? roleName)
+        {
+            return await ReviewFeeAsync(tuitionFeeId, adminId, roleName, approve: false);
+        }
+
+        private async Task<bool> ReviewFeeAsync(Guid tuitionFeeId, Guid adminId, string? roleName, bool approve)
+        {
+            if (!IsAdmin(roleName))
+            {
+                return false;
+            }
+
+            var tuitionFee = await _context.TuitionFees
+                .Include(x => x.Class)
+                .FirstOrDefaultAsync(x => x.Id == tuitionFeeId && x.ApprovalStatus == ApprovalPending);
+
+            if (tuitionFee == null)
+            {
+                return false;
+            }
+
+            tuitionFee.ApprovalStatus = approve ? ApprovalApproved : ApprovalRejected;
+            tuitionFee.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            // Báo cho người tạo (teacher) + cập nhật badge cho admin.
+            if (tuitionFee.CreatedBy.HasValue)
+            {
+                var statusText = approve ? "đã được duyệt" : "đã bị từ chối";
+                var title = approve ? "Phí khác được duyệt" : "Phí khác bị từ chối";
+                var content = $"Khoản phí \"{tuitionFee.Description}\" (lớp {tuitionFee.Class?.ClassName}) {statusText}.";
+
+                await _notificationService.CreateSimpleNotificationAsync(adminId, tuitionFee.CreatedBy.Value, title, content);
+                await _approvalHub.Clients.Group(ApprovalHub.UserGroup(tuitionFee.CreatedBy.Value))
+                    .SendAsync("FeeReviewed", new { approved = approve, description = tuitionFee.Description, title, content });
+            }
+
+            var remaining = await CountPendingApprovalsAsync(roleName);
+            await _approvalHub.Clients.Group(ApprovalHub.AdminGroup).SendAsync("PendingCountChanged", new { count = remaining });
+
+            return true;
+        }
+
+        private async Task NotifyAdminsPendingFeeAsync(Guid teacherId, string className, string description, decimal amount, int studentCount)
+        {
+            var teacherName = await _context.Users
+                .Where(x => x.Id == teacherId)
+                .Select(x => x.FullName)
+                .FirstOrDefaultAsync() ?? "Giáo viên";
+
+            var adminIds = await _context.Users
+                .Where(x => x.Role.RoleName == AppRoles.Admin)
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            var title = "Phí khác chờ duyệt";
+            var content = $"{teacherName} tạo khoản phí \"{description}\" cho lớp {className} ({studentCount} học sinh, {amount:N0} VND/HS). Vui lòng duyệt.";
+
+            foreach (var adminId in adminIds)
+            {
+                await _notificationService.CreateSimpleNotificationAsync(teacherId, adminId, title, content);
+            }
+
+            var pendingCount = await _context.TuitionFees.CountAsync(x => x.ApprovalStatus == ApprovalPending);
+            await _approvalHub.Clients.Group(ApprovalHub.AdminGroup).SendAsync("PendingFeeCreated", new
+            {
+                title,
+                content,
+                teacherName,
+                className,
+                description,
+                count = pendingCount
+            });
+        }
+
         private async Task<bool> CanAccessTuitionFeeAsync(TuitionFee tuitionFee, Guid currentUserId, string? roleName)
         {
-            if (string.Equals(roleName, "ADMIN", StringComparison.OrdinalIgnoreCase))
+            if (IsAdmin(roleName))
             {
                 return true;
             }
 
+            // Teacher KHÔNG được thanh toán (thu tiền/online là việc của Admin, Parent, Student).
             if (IsTeacher(roleName))
             {
-                return tuitionFee.Class != null && tuitionFee.Class.TeacherId == currentUserId;
+                return false;
             }
 
             if (IsStudent(roleName))
@@ -504,10 +729,21 @@ namespace FapWeb.Services.Service
             return "UNPAID";
         }
 
+        // Quản lý học phí (tạo phí tháng, thu tiền, nhắc nợ) giờ chỉ Admin.
         private static bool CanManageTuition(string? roleName)
         {
-            return string.Equals(roleName, "ADMIN", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(roleName, "TEACHER", StringComparison.OrdinalIgnoreCase);
+            return IsAdmin(roleName);
+        }
+
+        private static bool IsAdmin(string? roleName)
+        {
+            return string.Equals(roleName, "ADMIN", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Staff = Admin hoặc Teacher (được tạo "phí khác").
+        private static bool IsStaff(string? roleName)
+        {
+            return IsAdmin(roleName) || IsTeacher(roleName);
         }
 
         private static bool IsTeacher(string? roleName)

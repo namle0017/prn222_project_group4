@@ -12,7 +12,7 @@ namespace FapWeb.Services.IServices
 
         Task<Guid?> CreateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName);
 
-        Task<bool> UpdateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName);
+        Task<(bool Ok, string? Error)> UpdateAsync(ScheduleFormDto request, Guid currentUserId, string? roleName);
 
         Task<ClassScheduleViewDto?> GetClassScheduleAsync(Guid classId, Guid currentUserId, string? roleName);
     }

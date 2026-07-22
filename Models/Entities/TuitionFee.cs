@@ -19,6 +19,14 @@ public partial class TuitionFee
 
     public int? StatusId { get; set; }
 
+    public string? Description { get; set; }
+
+    public string FeeType { get; set; } = "TUITION";
+
+    public string ApprovalStatus { get; set; } = "APPROVED";
+
+    public Guid? CreatedBy { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
@@ -28,6 +36,8 @@ public partial class TuitionFee
     public virtual TuitionFeeStatus? Status { get; set; }
 
     public virtual User Student { get; set; } = null!;
+
+    public virtual User? CreatedByNavigation { get; set; }
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

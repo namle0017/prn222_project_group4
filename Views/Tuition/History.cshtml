@@ -31,6 +31,7 @@
                     <tr>
                         <th>Ngày</th>
                         <th>Học sinh</th>
+                        <th>Nội dung</th>
                         <th>Số tiền</th>
                         <th>Ghi chú</th>
                         <th>Người ghi nhận</th>
@@ -43,6 +44,7 @@
                         <tr>
                             <td>@item.PaymentDate.ToString("dd/MM/yyyy")</td>
                             <td>@item.StudentName</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Description) ? "N/A" : item.Description)</td>
                             <td>@item.Amount.ToString("N0") VND</td>
                             <td>@(string.IsNullOrWhiteSpace(item.Note) ? "N/A" : item.Note)</td>
                             <td>@item.RecordedByName</td>

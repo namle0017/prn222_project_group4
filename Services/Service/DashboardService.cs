@@ -32,6 +32,7 @@ namespace FapWeb.Services.Service
                 TotalCollectedTuition = totalCollected,
                 TotalOutstandingTuition = totalExpected - totalCollected,
                 StudentsWithUnpaidTuition = await _context.TuitionFees.CountAsync(x => x.TotalAmount - (x.PaidAmount ?? 0) > 0),
+                PendingFeeApprovals = await _context.TuitionFees.CountAsync(x => x.ApprovalStatus == "PENDING"),
                 OverallAttendanceRate = attendanceRate,
                 LatestNotifications = await GetLatestNotificationsAsync()
             };

@@ -10,6 +10,8 @@ namespace FapWeb.Models.Dtos.TuitionDtos
 
         public string StudentName { get; set; } = string.Empty;
 
+        public string? Description { get; set; }
+
         public decimal RemainingAmount { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]

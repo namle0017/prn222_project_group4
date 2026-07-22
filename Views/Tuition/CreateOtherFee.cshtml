@@ -1,0 +1,64 @@
+@model FapWeb.Models.Dtos.TuitionDtos.OtherFeeCreateDto
+
+@{
+    ViewData["Title"] = "Tạo phí khác";
+    var isTeacher = AppRoles.IsTeacher(Context.Session.GetString(AppSessionKeys.RoleName));
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h2 class="mb-2">@ViewData["Title"]</h2>
+                <p class="text-muted small mb-4">
+                    Tạo khoản phí khác (ngoài học phí tháng) cho <strong>tất cả học sinh</strong> trong lớp được chọn.
+                    @if (isTeacher)
+                    {
+                        <span class="text-warning">Khoản phí do giáo viên tạo sẽ ở trạng thái <strong>chờ Admin duyệt</strong> trước khi hiển thị để thanh toán.</span>
+                    }
+                </p>
+
+                <form asp-action="CreateOtherFee" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="ClassId" class="form-label"></label>
+                        <select asp-for="ClassId" asp-items="Model.ClassOptions" class="form-select">
+                            <option value="">-- Chọn lớp --</option>
+                        </select>
+                        <span asp-validation-for="ClassId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <input asp-for="Description" class="form-control" placeholder="VD: Phí dã ngoại, phí tài liệu..." />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Amount" class="form-label"></label>
+                            <input asp-for="Amount" class="form-control" type="number" step="1000" min="1000" placeholder="VD: 200000" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DueDate" class="form-label"></label>
+                            <input asp-for="DueDate" class="form-control" type="date" />
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Tạo phí khác</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

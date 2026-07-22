@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Học sinh trong lớp";
+    var isAdmin = AppRoles.IsAdmin(Context.Session.GetString(AppSessionKeys.RoleName));
 }
 
 <div class="container mt-4">
@@ -9,7 +10,10 @@
         <h2 class="mb-0">@Model.ClassName - Học sinh</h2>
         <div class="d-flex gap-2">
             <a asp-action="ExportStudents" asp-route-id="@Model.ClassId" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Xuất Excel</a>
-            <a asp-action="AddStudent" asp-route-classId="@Model.ClassId" class="btn btn-primary">Thêm học sinh</a>
+            @if (isAdmin)
+            {
+                <a asp-action="AddStudent" asp-route-classId="@Model.ClassId" class="btn btn-primary">Thêm học sinh</a>
+            }
             <a asp-action="Details" asp-route-id="@Model.ClassId" class="btn btn-outline-secondary">Trở về</a>
         </div>
     </div>
@@ -38,7 +42,10 @@
                         <th>Người giám hộ</th>
                         <th>Ngày tham gia</th>
                         <th>Trạng thái</th>
-                        <th></th>
+                        @if (isAdmin)
+                        {
+                            <th></th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -49,14 +56,17 @@
                             <td>@(string.IsNullOrWhiteSpace(student.GuardianName) ? "Không có" : student.GuardianName)</td>
                             <td>@(student.EnrolledAt.HasValue ? student.EnrolledAt.Value.ToString("dd/MM/yyyy HH:mm") : "Không có")</td>
                             <td><span class="badge @(student.IsActive ? "bg-success" : "bg-secondary")">@(student.IsActive ? "Hoạt động" : "Không hoạt động")</span></td>
-                            <td class="text-end">
-                                <form asp-action="RemoveStudent" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="classId" value="@Model.ClassId" />
-                                    <input type="hidden" name="studentId" value="@student.StudentId" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
-                                </form>
-                            </td>
+                            @if (isAdmin)
+                            {
+                                <td class="text-end">
+                                    <form asp-action="RemoveStudent" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="classId" value="@Model.ClassId" />
+                                        <input type="hidden" name="studentId" value="@student.StudentId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                    </form>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>

@@ -180,6 +180,12 @@ namespace FapWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> AddStudent(Guid classId)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -199,6 +205,12 @@ namespace FapWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddStudent(AddStudentToClassDto request)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -225,6 +237,12 @@ namespace FapWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveStudent(Guid classId, Guid studentId)
         {
+            var accessCheck = EnsureAdmin();
+            if (accessCheck != null)
+            {
+                return accessCheck;
+            }
+
             var userId = GetCurrentUserId();
             if (userId == null)
             {
@@ -237,6 +255,22 @@ namespace FapWeb.Controllers
                 : "Unable to remove student.";
 
             return RedirectToAction(nameof(Students), new { id = classId });
+        }
+
+        private IActionResult? EnsureAdmin()
+        {
+            var userIdStr = HttpContext.Session.GetString(AppSessionKeys.UserId);
+            if (string.IsNullOrWhiteSpace(userIdStr))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            if (!AppRoles.IsAdmin(HttpContext.Session.GetString(AppSessionKeys.RoleName)))
+            {
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            return null;
         }
 
         private Guid? GetCurrentUserId()

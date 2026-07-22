@@ -1,0 +1,85 @@
+@model IEnumerable<FapWeb.Models.Dtos.TuitionDtos.PendingFeeApprovalDto>
+
+@{
+    ViewData["Title"] = "Duyệt phí khác";
+    var items = Model.ToList();
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">@ViewData["Title"] <span class="badge bg-danger" id="pending-count">@items.Count</span></h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="alert alert-info small" id="realtime-hint">Trang tự cập nhật khi có phí mới (realtime). Tải lại để xem chi tiết mới nhất.</div>
+
+    @if (!items.Any())
+    {
+        <div class="alert alert-secondary shadow-sm">Không có khoản phí nào đang chờ duyệt.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Học sinh</th>
+                        <th>Lớp</th>
+                        <th>Nội dung</th>
+                        <th>Số tiền</th>
+                        <th>Hạn đóng</th>
+                        <th>Người tạo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.StudentName</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.ClassName) ? "N/A" : item.ClassName)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Description) ? "N/A" : item.Description)</td>
+                            <td>@item.Amount.ToString("N0") VND</td>
+                            <td>@(item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                            <td>@(item.CreatedByName ?? "N/A")</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <form asp-action="ApproveFee" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
+                                        <button type="submit" class="btn btn-sm btn-success">Duyệt</button>
+                                    </form>
+                                    <form asp-action="RejectFee" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="tuitionFeeId" value="@item.TuitionFeeId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Từ chối</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Khi có phí mới được teacher tạo -> tải lại danh sách để hiện dòng mới.
+        if (window.fapApproval) {
+            window.fapApproval.onPendingFeeCreated(function () {
+                location.reload();
+            });
+        }
+    </script>
+}
