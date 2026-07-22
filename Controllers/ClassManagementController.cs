@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FapWeb.Controllers
 {
+    // Toan bo khu vuc quan ly lop chi danh cho ADMIN va TEACHER.
+    // Menu trong _Layout da an voi cac vai tro khac, nhung truoc day go
+    // thang URL van vao duoc nen can chan o day.
+    [RequireRole(AppRoles.Admin, AppRoles.Teacher)]
     public class ClassManagementController : Controller
     {
         private readonly IClassManagementService _classManagementService;
